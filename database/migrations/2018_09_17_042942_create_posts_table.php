@@ -16,8 +16,8 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->integer('estado_id')->unsigned();
-            $table->integer('provincia_id');
+            $table->integer('state_id')->unsigned();
+            $table->integer('provincia_id')->unsigned();
 
             $table->string('title');
             $table->string('descripcion');
@@ -26,7 +26,8 @@ class CreatePostsTable extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('estado_id')->references('id')->on('estados');
+            $table->foreign('state_id')->references('id')->on('states');
+            $table->foreign('provincia_id')->references('id')->on('provincias');
 
         });
     }

@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Photo extends Model
 {
 
     public $incrementing = false;
     
     protected $keyType = 'string';
-    protected $table = 'posts';
+    protected $table = 'photos';
 
     /**
      * The attributes that are mass assignable.
@@ -18,11 +18,8 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id',
-        'state_id',
-        'provincia_id',
-        'title',
-        'descripcion',
-        'fecha_publicacion'
+        'post_id',
+        'image',
+        'extension'
     ];
 }

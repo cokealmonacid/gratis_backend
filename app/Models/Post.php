@@ -23,6 +23,6 @@ class Post extends Model
         'provincia_id',
         'title',
         'descripcion',
-        'fecha_publicacion'
+        'publish_date'
     ];
 }

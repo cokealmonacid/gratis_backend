@@ -6,14 +6,17 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\User;
 
 class TestController extends ApiController
 {
 	/**
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function test() {
+	public function test(Request $request) {
 
-		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => 'esta es una prueba']);
+		$users = User::all();
+
+		return $users;
 	}
 }

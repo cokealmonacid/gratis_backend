@@ -22,7 +22,7 @@ class Post extends Model
         'state_id',
         'provincia_id',
         'title',
-        'descripcion',
+        'description',
         'publish_date'
     ];
 }

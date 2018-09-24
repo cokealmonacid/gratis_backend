@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-
+use Faker\Factory as Faker;
+use App\Models\Tag;
 
 class TagsTableSeeder extends Seeder
 {
@@ -13,8 +13,12 @@ class TagsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('tags')->insert([
-            'description' => str_random(10)
-        ]);
+        $faker = Faker::create();
+
+        foreach(range(1, 30) as $index) {
+            Tag::create([
+                'description' => $faker->word
+            ]);
+        }
     }
 }

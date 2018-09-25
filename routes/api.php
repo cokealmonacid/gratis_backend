@@ -14,5 +14,5 @@ use Illuminate\Http\Request;
 */
 
 Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
-	Route::get('/prueba', 'TestController@test');
+	Route::post('/users/login', 'UsersController@login');
 });

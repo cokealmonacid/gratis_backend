@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 use App\Models\User_Rol;
 use App\Models\Rol;
+use Hash;
 
 class UserLoginApiTest extends TestCase
 {
@@ -80,5 +81,35 @@ class UserLoginApiTest extends TestCase
 		$response = $this->postJson('api/v1/users/login', $data);
 
 		$response->assertStatus(400);
+	}
+
+	/** @test */
+	public function it_login_a_user()
+	{
+		$email    = $this->faker->freeEmail();
+		$password = $this->faker->word();
+		$name     = $this->faker->firstNameMale();
+
+		$user = User::create([
+			'email'    => $email,
+			'password' => Hash::make($password),
+			'name'     => $name
+		]);
+
+		$rol = Rol::where('description', 'user')->first();
+
+		User_rol::create([
+			'user_id' => $user->id->toString(),
+			'rol_id'  => $rol->id
+		]);
+
+		$data     = [
+			'email'    => $email,
+			'password' => $password
+		];
+
+		$response = $this->postJson('api/v1/users/login', $data);
+
+		$response->assertStatus(200);
 	}
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
+use App\Http\Transformers\UserTransformer;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\User_Rol;
@@ -11,6 +12,19 @@ use Auth;
 
 class UsersController extends ApiController
 {
+    /**
+     * @var UserTransformer
+     */
+    protected $userTransformer;
+
+    /**
+     * @param UserTransformer $userTransformer
+     */
+    function __construct(UserTransformer $userTransformer)
+    {
+        $this->userTransformer = $userTransformer;
+    }
+
     public function login(Request $request) 
     {
     	$email    = $request->input('email');
@@ -33,7 +47,7 @@ class UsersController extends ApiController
 
     	$attempt = Auth::attempt(['email' => $email, 'password' => $password]);
     	if ($attempt) {
-    		return $user;
+    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user)]);
     	}
 
     	return $this->respondBadRequest('The email and password dont match');

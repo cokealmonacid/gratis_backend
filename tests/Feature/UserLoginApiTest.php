@@ -12,7 +12,7 @@ use Hash;
 
 class UserLoginApiTest extends TestCase
 {
-	use WithFaker;
+	use WithFaker, RefreshDatabase;
 
 	/** @test */ 
 	public function it_throws_login_validation_error()

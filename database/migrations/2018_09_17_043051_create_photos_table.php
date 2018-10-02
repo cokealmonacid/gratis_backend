@@ -17,6 +17,7 @@ class CreatePhotosTable extends Migration
             $table->uuid('id');
             $table->string('post_id');
             $table->longText('image');
+            $table->longText('thumbnail');
             $table->string('extension');
             $table->timestamps();
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class Photo extends Model
 {
@@ -21,6 +22,7 @@ class Photo extends Model
     protected $fillable = [
         'post_id',
         'image',
+        'thumbnail',
         'extension'
     ];
 }

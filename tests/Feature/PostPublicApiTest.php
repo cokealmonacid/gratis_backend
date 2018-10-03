@@ -23,7 +23,8 @@ class PostPublicApiTest extends TestCase
 
     /** @test */
     public function it_get_public_posts() {
-       $_page =  rand(1, 15);
+        $_page =  rand(1, 15);
+        
         $response = $this->getJson("api/v1/posts/public?page={$_page}");
 
         $response->assertStatus(200);

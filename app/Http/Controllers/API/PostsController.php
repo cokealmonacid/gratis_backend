@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Post;
-use Auth;
+use Validator;
 
 class PostsController  extends ApiController
 {
@@ -23,6 +23,13 @@ class PostsController  extends ApiController
             ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
+    }
+
+    public function store (Request $request) {
+        $validator = Validator::make($request->all(), Post::rules());
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
+        }
     }
 
 }

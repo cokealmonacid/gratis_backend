@@ -6,7 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Post;
+use App\Models\Post_Tags;
+use App\Models\Provincia;
+use App\Models\Tag;
 use Validator;
+use Auth;
 
 class PostsController  extends ApiController
 {
@@ -28,8 +32,51 @@ class PostsController  extends ApiController
     public function store (Request $request) {
         $validator = Validator::make($request->all(), Post::rules());
         if ($validator->fails()) {
+            return $this->respondFailedParametersValidation($validator->errors()->first());
+        }
+
+        $tags = $this->check_tags($request->input('tags'));
+        if (!$tags) {
+            return $this->respondFailedParametersValidation('The tags provided doesnt exist');
+        }
+
+        $title        = $request->input('title');
+        $description  = $request->input('description');
+        $provincia_id = $request->input('provincia_id');
+        $provincia    = Provincia::whereId($provincia_id)->first();
+        if (!$provincia) {
             return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
+        }
+
+        $user = Auth::guard('api')->user();
+        $post = Post::create([
+            'title'        => $title,
+            'description'  => $description,
+            'provincia_id' => $provincia->id,
+            'user_id'      => $user->id,
+            'state_id'    => 2
+        ]);
+
+        if (!$post) {
+            return $this->respondFailedParametersValidation('Error while internally saving an post');
+        }
+
+        foreach($tags as $tag) {
+            Post_Tags::create([
+                'post_id' => $post->id,
+                'tag_id'  => $tag->id
+            ]);
         }
     }
 
+    private function check_tags($tags){
+        foreach($tags as $tag) {
+            $tag = Tag::whereId($tag)->first();
+            if (!$tag) {
+                return false;
+            }
+        }
+
+        return $tags;
+    }
 }

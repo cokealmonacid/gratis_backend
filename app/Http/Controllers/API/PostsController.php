@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Photo;
 use App\Models\Post;
 use App\Models\Post_Tags;
 use App\Models\Provincia;
@@ -40,6 +41,11 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation('The tags provided doesnt exist');
         }
 
+        $photos = $this->check_photos($request->input('photos'));
+        if (!$photos) {
+            return $this->respondFailedParametersValidation('There is a problem with the images provided');
+        }
+
         $title        = $request->input('title');
         $description  = $request->input('description');
         $provincia_id = $request->input('provincia_id');
@@ -64,7 +70,7 @@ class PostsController  extends ApiController
         foreach($tags as $tag) {
             Post_Tags::create([
                 'post_id' => $post->id,
-                'tag_id'  => $tag->id
+                'tag_id'  => $tag
             ]);
         }
     }
@@ -78,5 +84,22 @@ class PostsController  extends ApiController
         }
 
         return $tags;
+    }
+
+    private function check_photos($photos){
+        
+        foreach($photos as $photo){
+
+            if (!is_array($photo)) {
+                return false;
+            }
+
+            $validator = Validator::make($photo, Photo::rules());
+            if ($validator->fails()) {
+                return false;
+            }
+        }
+
+        return $photos;
     }
 }

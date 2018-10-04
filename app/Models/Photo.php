@@ -23,6 +23,19 @@ class Photo extends Model
         'post_id',
         'image',
         'thumbnail',
-        'extension'
+        'extension',
+        'principal'
     ];
+
+    public static function rules(){
+        return [
+            'content'         => 'required',
+            'extension'       => 'required',
+            'principal'       => 'required',        
+        ];
+    }
+
+    public statis function createThumbnail($image){
+        
+    }
 }

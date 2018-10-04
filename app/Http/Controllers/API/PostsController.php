@@ -54,7 +54,7 @@ class PostsController  extends ApiController
             'description'  => $description,
             'provincia_id' => $provincia->id,
             'user_id'      => $user->id,
-            'state_id'    => 2
+            'state_id'     => 2
         ]);
 
         if (!$post) {

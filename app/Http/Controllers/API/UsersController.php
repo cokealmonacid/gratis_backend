@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 use App\Http\Controllers\ApiController;
 use App\Http\Transformers\UserTransformer;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\User_Rol;
 use Auth;
+use Validator;
+use Illuminate\Support\Str;
+
 
 class UsersController extends ApiController
 {
@@ -52,4 +57,28 @@ class UsersController extends ApiController
 
     	return $this->respondBadRequest('The email and password dont match');
     }
+
+    public function create(Request $request){
+
+        $validator = Validator::make(\Request::all(), User::rulesForCreate()->rules , User::rulesForCreate()->messages);
+
+        if ($validator->fails()) {
+            $error_message = $validator->errors()->first();
+            return $this->respondFailedParametersValidation($error_message);
+        }
+
+        $_email    = $request->input('email');
+        $_password = $request->input('password');
+        $_api_token = Str::uuid();
+
+        $user = User::create([
+            'email'     => $_email,
+            'password'  => bcrypt($_password),
+            'api_token' => $_api_token
+        ]);
+
+        return $user;
+    }
+
+
 }

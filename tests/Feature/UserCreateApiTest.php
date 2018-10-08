@@ -14,13 +14,6 @@ class UserCreateApiTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
-    /** @test */
-    public function it_throws_create_validation_error()
-    {
-        $this->it_throws_create_email_validation_error();
-        $this->it_throws_create_password_validation_error();
-
-    }
 
     /** @test */
     public function createUser()
@@ -33,7 +26,8 @@ class UserCreateApiTest extends TestCase
         $response->assertStatus(201);
     }
 
-    private  function it_throws_create_email_validation_error()
+    /** @test */
+    public function it_throws_create_email_format_validation_error()
     {
         $_email    = $this->faker->word();
         $_password = $this->faker->text(8);
@@ -41,13 +35,21 @@ class UserCreateApiTest extends TestCase
 
         $response->assertStatus(422);
 
+
+    }
+    /** @test */
+    public function it_throws_create_unique_email_validation_error()
+    {
+        $_password = $this->faker->text(8);
         $_email    = User::all()->first()->email;
         $response = $this->postJson('api/v1/users/',["email" =>"{$_email}", "password" => "{$_password}"]);
 
         $response->assertStatus(422);
 
     }
-    private  function it_throws_create_password_validation_error()
+
+    /** @test */
+    public function it_throws_create_password_validation_error()
     {
         $_email    = $this->faker->freeEmail();
         $_password = $this->faker->word();

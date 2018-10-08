@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Photo extends Model
 {
-    use Notifiable;
-    use AutoGenerateUuid;
+
     public $incrementing = false;
     
     protected $keyType = 'string';

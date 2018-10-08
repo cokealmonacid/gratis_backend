@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Region extends Model
+class State extends Model
 {
-    protected $table = 'regiones';
+    protected $table = 'states';
 
     /**
      * The attributes that are mass assignable.

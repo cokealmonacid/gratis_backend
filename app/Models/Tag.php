@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Tag extends Model
+class Rol extends Model
 {
-    protected $table = 'tags';
+    protected $table = 'roles';
 
     /**
      * The attributes that are mass assignable.
@@ -14,6 +14,6 @@ class Tag extends Model
      * @var array
      */
     protected $fillable = [
-        'description'
+        'description',
     ];
 }

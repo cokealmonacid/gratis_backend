@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Post_Tags extends Model
+class User_Rol extends Model
 {
-    protected $table = 'post_tags';
+    protected $table = 'user_roles';
 
     /**
      * The attributes that are mass assignable.
@@ -14,6 +14,6 @@ class Post_Tags extends Model
      * @var array
      */
     protected $fillable = [
-        'post_id', 'tag_id',
+        'user_id', 'rol_id',
     ];
 }

@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Provincia extends Model
+class User_Rol extends Model
 {
-    protected $table = 'provincias';
+    protected $table = 'user_roles';
 
     /**
      * The attributes that are mass assignable.
@@ -14,6 +14,6 @@ class Provincia extends Model
      * @var array
      */
     protected $fillable = [
-        'description', 'region_id',
+        'user_id', 'rol_id',
     ];
 }

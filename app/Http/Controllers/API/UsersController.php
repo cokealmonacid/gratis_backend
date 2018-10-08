@@ -69,15 +69,15 @@ class UsersController extends ApiController
 
         $_email    = $request->input('email');
         $_password = $request->input('password');
+        $_api_token = Str::uuid();
 
-        $user = User::create(
-            [
+        $user = User::create([
             'email'     => $_email,
-            'password'  => bcrypt($_password)
-            ]
-        );
+            'password'  => bcrypt($_password),
+            'api_token' => $_api_token
+        ]);
 
-         return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
+        return $user;
     }
 
 

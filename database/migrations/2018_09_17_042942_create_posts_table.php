@@ -20,7 +20,7 @@ class CreatePostsTable extends Migration
             $table->integer('provincia_id')->unsigned();
 
             $table->string('title');
-            $table->text('description');
+            $table->string('description');
             $table->timestamp('publish_date');
 
             $table->timestamps();

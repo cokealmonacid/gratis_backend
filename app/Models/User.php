@@ -6,7 +6,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-
 class User extends Authenticatable
 {
     use Notifiable;
@@ -35,20 +34,4 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
-    public static function rulesForCreate() {
-        return (object) array (
-            'rules' => [
-            'email' => 'required|email|unique:users',
-            'password'  => 'required|min:8'
-              ],
-            'messages'=> [
-                'email.required'=>'No puede dejar el campo email vacio',
-                'email.email'=>'No es un email valido',
-                'email.unique'=>'El correo ya se encuentra registrado',
-                'password.required'=>'No puede dejar el campo password vacio',
-                'password.min'=>'La contraseña debe tener un minimo de :min caracteres'
-
-            ]);
-    }
 }

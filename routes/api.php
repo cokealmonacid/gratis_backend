@@ -14,12 +14,10 @@ use Illuminate\Http\Request;
 */
 
 Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
+	/** Users **/
     Route::post('/users/login', 'UsersController@login');
     Route::post('/users', 'UsersController@create');
 
-});
-
-
-Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
-    Route::get('/posts/public', 'PostsController@getPublicPosts');
+	/** Posts **/
+    Route::get('/posts/public', 'PostsController@index');
 });

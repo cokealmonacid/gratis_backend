@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Faker\Factory as Faker;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UsersTableSeeder extends Seeder
 {
@@ -13,30 +12,10 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
-
-        User::create([
-            'name'      => $faker->firstName,
-            'email'     => 'a@gmail.com',
-            'password'  => bcrypt('1234'),
-            'phone'     => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
-        ]);
-
-        User::create([
-            'name'     => $faker->firstName,
-            'email'    => 'b@gmail.com',
-            'password' => bcrypt('1234'),
-            'phone'    => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
-        ]);
-
-        User::create([
-            'name'     => $faker->firstName,
-            'email'    => 'c@gmail.com',
-            'password' => bcrypt('1234'),
-            'phone'    => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
+        DB::table('users')->insert([
+            'name' => str_random(10),
+            'email' => str_random(10).'@gmail.com',
+            'password' => bcrypt('secret'),
         ]);
     }
 }

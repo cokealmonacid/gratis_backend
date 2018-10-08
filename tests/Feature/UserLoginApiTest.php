@@ -63,22 +63,7 @@ class UserLoginApiTest extends TestCase
 		];
 
 		$response = $this->postJson('api/v1/users/login', $data);
-
-		$response->assertStatus(400);
-	}
-
-	/** @test */
-	public function it_throws_email_and_password_dont_match()
-	{
-		$user = User::first();
-
-		$data = [
-			'email'    => $user->email,
-			'password' => $user->email
-		];
-
-		$response = $this->postJson('api/v1/users/login', $data);
-
+		
 		$response->assertStatus(400);
 	}
 }

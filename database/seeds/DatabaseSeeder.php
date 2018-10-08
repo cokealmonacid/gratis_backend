@@ -18,6 +18,5 @@ class DatabaseSeeder extends Seeder
         $this->call(UserRolTableSeeder::class);
         $this->call(TagsTableSeeder::class);
         $this->call(ProvinciasTableSeeder::class);
-        $this->call(PostTableSeeder::class);
     }
 }

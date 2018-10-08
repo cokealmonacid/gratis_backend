@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\Rol;
+use Illuminate\Support\Facades\DB;
+
 
 class RolesTableSeeder extends Seeder
 {
@@ -12,13 +13,8 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        $roles = ['user', 'admin'];
-
-        foreach(range(0, count($roles) - 1) as $index) {
-            Rol::create([
-                'id'          => $index + 1,
-                'description' => $roles[$index]
-            ]);
-        }
+        DB::table('roles')->insert([
+            'description' => str_random(10)
+        ]);
     }
 }

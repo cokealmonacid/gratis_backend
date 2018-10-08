@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\State;
+use Illuminate\Support\Facades\DB;
 
 class StatesTableSeeder extends Seeder
 {
@@ -12,13 +12,9 @@ class StatesTableSeeder extends Seeder
      */
     public function run()
     {
-        $states = ['active', 'inactive', 'finalized'];
-
-        foreach(range(0, count($states) - 1) as $index) {
-            State::create([
-                'id'          => $index + 1,
-                'description' => $states[$index]
-            ]);
-        }
+        //
+        DB::table('states')->insert([
+            'description' => str_random(10)
+        ]);
     }
 }

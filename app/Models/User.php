@@ -4,19 +4,18 @@ namespace App\Models;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Passport\HasApiTokens;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 
 class User extends Authenticatable
 {
-    use Notifiable;
-    use AutoGenerateUuid;
+    use HasApiTokens, Notifiable;
 
     public $incrementing = false;
 
     protected $table = 'users';
-
-    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.

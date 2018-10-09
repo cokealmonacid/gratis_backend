@@ -10,8 +10,7 @@ class UserTransformer extends Transformer {
 	{
 		return [
 			'name'      => $user['name'],
-			'email'     => $user['email'],
-			'api_token' => $user['api_token']
-		];
+			'email'     => $user['email']
+        ];
 	}
 }

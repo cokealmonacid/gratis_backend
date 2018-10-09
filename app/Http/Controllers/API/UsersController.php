@@ -52,10 +52,32 @@ class UsersController extends ApiController
 
     	$attempt = Auth::attempt(['email' => $email, 'password' => $password]);
     	if ($attempt) {
-    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user)]);
+
+            $user = $request->user();
+            $tokenResult = $user->createToken('Personal Access Token');
+            $token = $tokenResult->token;
+            if ($request->remember_me) {
+                $token->expires_at = Carbon::now()->addWeeks(1);
+            }
+            $token->save();
+            $_token_data =  [
+            'access_token' => $tokenResult->accessToken,
+            'token_type'   => 'Bearer',
+            'expires_at'   => Carbon::parse(
+                $tokenResult->token->expires_at)
+                ->toDateTimeString() ];
+
+    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' =>$_token_data ]);
     	}
 
     	return $this->respondBadRequest('The email and password dont match');
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->token()->revoke();
+        return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "Se ha desconectado con exito."]);
+
     }
 
     public function create(Request $request){

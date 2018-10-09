@@ -73,6 +73,16 @@ class PostsController  extends ApiController
                 'tag_id'  => $tag
             ]);
         }
+
+        foreach($photos as $photo) {
+            Photo::create([
+                'post_id'   => $post->id,
+                'image'     => $photo['content'],
+                'thumbnail' => Photo::createThumbnail($photo['content']),
+                'extension' => $photo['extension'],
+                'principal' => $photo['principal']
+            ]);
+        }
     }
 
     private function check_tags($tags){

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class Photo extends Model
 {
@@ -29,13 +30,16 @@ class Photo extends Model
 
     public static function rules(){
         return [
-            'content'         => 'required',
+            'content'         => 'required|imageable',
             'extension'       => 'required',
             'principal'       => 'required',        
         ];
     }
 
-    public statis function createThumbnail($image){
-        
+    public static function createThumbnail($image){
+        $originalImage = base64_decode($image);
+        $encodedImage  = (string) Image::make($originalImage)->resize(180, 180)->encode('data-url');
+        $thumbnail     = explode(",", $encodedImage)[1];
+        return $thumbnail;
     }
 }

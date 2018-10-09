@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
+use App\Http\Transformers\PostTransformer;
 use App\Models\Photo;
 use App\Models\Post;
 use App\Models\Post_Tags;
@@ -15,6 +16,19 @@ use Auth;
 
 class PostsController  extends ApiController
 {
+
+    /**
+     * @var PostTransformer
+     */
+    protected $postTransformer;
+
+    /**
+     * @param PostTransformer $postTransformer
+     */
+    function __construct(PostTransformer $postTransformer)
+    {
+        $this->postTransformer = $postTransformer;
+    }
 
     public function index (Request $request) {
         $_page    = $request->input('page');
@@ -83,6 +97,8 @@ class PostsController  extends ApiController
                 'principal' => $photo['principal']
             ]);
         }
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
     private function check_tags($tags){

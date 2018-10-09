@@ -21,3 +21,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 	/** Posts **/
     Route::get('/posts/public', 'PostsController@index');
 });
+
+Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {
+    Route::post('/users/logout', 'UsersController@logout');
+
+});

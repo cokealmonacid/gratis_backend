@@ -20,7 +20,6 @@ class UsersTableSeeder extends Seeder
             'email'     => 'a@gmail.com',
             'password'  => bcrypt('1234'),
             'phone'     => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
         ]);
 
         User::create([
@@ -28,7 +27,6 @@ class UsersTableSeeder extends Seeder
             'email'    => 'b@gmail.com',
             'password' => bcrypt('1234'),
             'phone'    => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
         ]);
 
         User::create([
@@ -36,7 +34,6 @@ class UsersTableSeeder extends Seeder
             'email'    => 'c@gmail.com',
             'password' => bcrypt('1234'),
             'phone'    => $faker->e164PhoneNumber,
-            'api_token' => $faker->uuid
         ]);
     }
 }

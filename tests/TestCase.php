@@ -12,5 +12,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->artisan("db:seed");
+        $this->artisan('passport:install');
+
     }
 }

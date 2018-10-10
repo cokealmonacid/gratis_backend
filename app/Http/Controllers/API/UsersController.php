@@ -10,6 +10,7 @@ use App\Http\Transformers\UserTransformer;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\User_Rol;
+use App\Models\Rol;
 use Auth;
 use Validator;
 use Illuminate\Support\Str;
@@ -34,9 +35,8 @@ class UsersController extends ApiController
     {
     	$email    = $request->input('email');
     	$password = $request->input('password');
-
     	if (!$email or !$password) {
-    		return $this->respondFailedParametersValidation();
+            return $this->respondFailedParametersValidation();
     	}
 
     	$user     = User::where('email', $email)->first();
@@ -49,13 +49,13 @@ class UsersController extends ApiController
     	if (!$hasRol) {
     		return $this->respondBadRequest('This email account does not exist');
     	}
-
     	$attempt = Auth::attempt(['email' => $email, 'password' => $password]);
+
     	if ($attempt) {
 
-            $user = $request->user();
             $tokenResult = $user->createToken('Personal Access Token');
             $token = $tokenResult->token;
+
             if ($request->remember_me) {
                 $token->expires_at = Carbon::now()->addWeeks(1);
             }
@@ -67,6 +67,7 @@ class UsersController extends ApiController
                 $tokenResult->token->expires_at)
                 ->toDateTimeString() ];
 
+
     		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' =>$_token_data ]);
     	}
 
@@ -76,13 +77,13 @@ class UsersController extends ApiController
     public function logout(Request $request)
     {
         $request->user()->token()->revoke();
-        return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "Se ha desconectado con exito."]);
+        return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "Logout success."]);
 
     }
 
     public function create(Request $request){
 
-        $validator = Validator::make(\Request::all(), User::rulesForCreate()->rules , User::rulesForCreate()->messages);
+        $validator = Validator::make(\Request::all(), User::rulesForCreate());
 
         if ($validator->fails()) {
             $error_message = $validator->errors()->first();
@@ -98,6 +99,12 @@ class UsersController extends ApiController
             'password'  => bcrypt($_password)
             ]
         );
+
+        $rol = Rol::where('description', 'user')->first();
+        User_rol::create([
+            'user_id' => $user->id,
+            'rol_id'  => $rol->id
+        ]);
 
          return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
     }

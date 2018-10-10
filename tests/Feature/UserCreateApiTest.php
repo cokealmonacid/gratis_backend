@@ -52,7 +52,7 @@ class UserCreateApiTest extends TestCase
     public function it_throws_create_password_validation_error()
     {
         $_email    = $this->faker->freeEmail();
-        $_password = $this->faker->word();
+        $_password = $this->faker->text(5);
         $response = $this->postJson('api/v1/users/',["email" =>"{$_email}", "password" => "{$_password}"]);
 
         $response->assertStatus(422);

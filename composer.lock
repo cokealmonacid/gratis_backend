@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d587cfddb43b67d104a9a21568d2468",
+    "content-hash": "31f4d331e842a9913b5e73d854dd10b5",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -430,7 +430,6 @@
             "time": "2018-02-07T20:20:57+00:00"
         },
         {
-<<<<<<< HEAD
             "name": "firebase/php-jwt",
             "version": "v5.0.0",
             "source": {
@@ -560,30 +559,6 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.0"
-=======
-            "name": "guzzlehttp/psr7",
-            "version": "1.4.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/psr7.git",
-                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
-                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "psr/http-message": "~1.0"
-            },
-            "provide": {
-                "psr/http-message-implementation": "1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
             },
             "type": "library",
             "extra": {
@@ -593,11 +568,7 @@
             },
             "autoload": {
                 "psr-4": {
-<<<<<<< HEAD
                     "GuzzleHttp\\Promise\\": "src/"
-=======
-                    "GuzzleHttp\\Psr7\\": "src/"
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
                 },
                 "files": [
                     "src/functions_include.php"
@@ -612,7 +583,6 @@
                     "name": "Michael Dowling",
                     "email": "mtdowling@gmail.com",
                     "homepage": "https://github.com/mtdowling"
-<<<<<<< HEAD
                 }
             ],
             "description": "Guzzle promises library",
@@ -644,7 +614,30 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.0"
-=======
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
                 },
                 {
                     "name": "Tobias Schultze",
@@ -690,14 +683,10 @@
                 "ext-gd": "to use GD library based image processing.",
                 "ext-imagick": "to use Imagick based image processing.",
                 "intervention/imagecache": "Caching extension for the Intervention Image library"
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-<<<<<<< HEAD
-                    "dev-master": "1.4-dev"
-=======
                     "dev-master": "2.4-dev"
                 },
                 "laravel": {
@@ -707,21 +696,12 @@
                     "aliases": {
                         "Image": "Intervention\\Image\\Facades\\Image"
                     }
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
                 }
             },
             "autoload": {
                 "psr-4": {
-<<<<<<< HEAD
-                    "GuzzleHttp\\Psr7\\": "src/"
-                },
-                "files": [
-                    "src/functions_include.php"
-                ]
-=======
                     "Intervention\\Image\\": "src/Intervention/Image"
                 }
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -729,28 +709,6 @@
             ],
             "authors": [
                 {
-<<<<<<< HEAD
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                },
-                {
-                    "name": "Tobias Schultze",
-                    "homepage": "https://github.com/Tobion"
-                }
-            ],
-            "description": "PSR-7 message implementation that also provides common utility methods",
-            "keywords": [
-                "http",
-                "message",
-                "request",
-                "response",
-                "stream",
-                "uri",
-                "url"
-            ],
-            "time": "2017-03-20T17:10:46+00:00"
-=======
                     "name": "Oliver Vogel",
                     "email": "oliver@olivervogel.com",
                     "homepage": "http://olivervogel.com/"
@@ -767,7 +725,6 @@
                 "watermark"
             ],
             "time": "2018-05-29T14:19:03+00:00"
->>>>>>> Added intervention-image, added function for create thumbnails based on base64string, few validations, added rule on photo
         },
         {
             "name": "jakub-onderka/php-console-color",

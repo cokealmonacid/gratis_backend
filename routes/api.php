@@ -25,4 +25,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {
     Route::post('/users/logout', 'UsersController@logout');
 
+    Route::post('/posts', 'PostsController@store');
 });
+

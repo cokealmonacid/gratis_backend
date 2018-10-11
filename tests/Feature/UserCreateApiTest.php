@@ -8,8 +8,6 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
 
-
-
 class UserCreateApiTest extends TestCase
 {
     use WithFaker, RefreshDatabase;

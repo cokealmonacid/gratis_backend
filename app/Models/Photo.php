@@ -23,6 +23,22 @@ class Photo extends Model
         'post_id',
         'image',
         'thumbnail',
-        'extension'
+        'extension',
+        'principal'
     ];
+
+    public static function rules(){
+        return [
+            'content'         => 'required|imageable',
+            'extension'       => 'required',
+            'principal'       => 'required',        
+        ];
+    }
+
+    public static function createThumbnail($image){
+        $originalImage = base64_decode($image);
+        $encodedImage  = (string) \Image::make($originalImage)->resize(180, 180)->encode('data-url');
+        $thumbnail     = explode(",", $encodedImage)[1];
+        return $thumbnail;
+    }
 }

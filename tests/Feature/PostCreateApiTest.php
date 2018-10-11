@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passport\Passport;
 use App\Models\Provincia;
 use App\Models\Tag;
 use App\Models\User;
@@ -19,9 +20,9 @@ class PostCreateApiTest extends TestCase
     /** @test */
     public function it_throws_post_validation_error()
     {
-    	$authorization = $this->create_and_login_user();
+        $this->user_login();   
 
-		$response = $this->postJson('api/v1/posts', [], $authorization);
+		$response = $this->postJson('api/v1/posts', []);
 
 		$response->assertStatus(422);
     }
@@ -29,7 +30,7 @@ class PostCreateApiTest extends TestCase
     /** @test */
     public function it_throws_tag_validation_error()
     {
-    	$authorization = $this->create_and_login_user();
+        $this->user_login(); 
 
     	$data = [
     		'title'        => $this->faker->words,
@@ -47,7 +48,7 @@ class PostCreateApiTest extends TestCase
     /** @test */
     public function it_throws_image_validation_error()
     {
-    	$authorization = $this->create_and_login_user();
+        $this->user_login(); 
 
     	$data = [
     		'title'        => $this->faker->words,
@@ -62,39 +63,11 @@ class PostCreateApiTest extends TestCase
 		$response->assertStatus(422);
     }    
 
-    private function create_and_login_user()
+    private function user_login()
     {
-	    /** login */
-        $email    = $this->faker->freeEmail();
-        $password = $this->faker->word();
+        $user = factory(User::class)->create();
 
-        $user = User::create([
-            'email'    => $email,
-            'password' => Hash::make($password)
-        ]);
-
-        $rol = Rol::where('description', 'user')->first();
-
-        User_rol::create([
-            'user_id' => $user->id,
-            'rol_id'  => $rol->id
-        ]);
-
-        $data     = [
-            'email'    => $email,
-            'password' => $password
-        ];
-
-        $response = $this->postJson('api/v1/users/login', $data);
-        $_response_content = (object) json_decode($response->content());
-
-        $access_token = $_response_content->client_token->access_token;
-        $type_token   = $_response_content->client_token->token_type;
-
-        return [
-        	'Content-Type'  => 'application/json',
-        	'Authorization' => $type_token . ' ' . $access_token
-        ];
+        Passport::actingAs($user,['api']); 
     }
 
 }

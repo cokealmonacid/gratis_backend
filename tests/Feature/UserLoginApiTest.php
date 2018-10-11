@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Passport\Passport;
 use App\Models\User;
 use App\Models\User_Rol;
 use App\Models\Rol;
@@ -112,33 +113,11 @@ class UserLoginApiTest extends TestCase
     /** @test */
 	public function it_logout_a_user(){
 	    /** login */
-        $email    = $this->faker->freeEmail();
-        $password = $this->faker->word();
+		$user = factory(User::class)->create();
 
-        $user = User::create([
-            'email'    => $email,
-            'password' => Hash::make($password)
-        ]);
+		Passport::actingAs($user,['api']); 
 
-        $rol = Rol::where('description', 'user')->first();
-
-        User_rol::create([
-            'user_id' => $user->id,
-            'rol_id'  => $rol->id
-        ]);
-
-        $data     = [
-            'email'    => $email,
-            'password' => $password
-        ];
-
-        $response = $this->postJson('api/v1/users/login', $data);
-        $_response_content = (object) json_decode($response->content());
-
-        $_access_token = $_response_content->client_token->access_token;
-        $_type_token = $_response_content->client_token->token_type;
-
-        $response = $this->postJson('api/v1/users/logout',[], ["Authorization" =>"{$_type_token} {$_access_token}"]);
+        $response = $this->postJson('api/v1/users/logout',[]);
 
         $response->assertStatus(200);
 

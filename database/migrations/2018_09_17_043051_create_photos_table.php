@@ -19,6 +19,7 @@ class CreatePhotosTable extends Migration
             $table->longText('image');
             $table->longText('thumbnail');
             $table->string('extension');
+            $table->boolean('principal')->default(false);
             $table->timestamps();
 
             $table->foreign('post_id')->references('id')->on('posts');

@@ -27,4 +27,14 @@ class Post extends Model
         'description',
         'publish_date'
     ];
+
+    public static function rules(){
+        return [
+            'title'         => 'required|max:255',
+            'description'   => 'required|max:255',
+            'provincia_id'  => 'required|min:1',
+            'tags'          => 'required|array',
+            'photos'        => 'required|array'        
+        ];
+    }
 }

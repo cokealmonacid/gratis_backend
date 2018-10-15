@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Http\Transformers\PostTransformer;
 use App\Models\Photo;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Post_Tags;
 use App\Models\Provincia;
 use App\Models\Tag;
@@ -101,6 +102,38 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
+    public function getPost ($id , Request $request) {
+        if ($this->check_post_id($id)) {
+            $post_detail = Post::getDetailPost($id);
+            $post_photos = Photo::where('post_id' ,'=', $id)->get();
+            if ( $request->user('api') ) {
+                return $this
+                    ->setStatusCode(Response::HTTP_OK)
+                    ->respond(['data' => $this->postTransformer->transformPostDetailUsers($post_detail,$post_photos)]);
+
+            }
+            else {
+                return $this
+                    ->setStatusCode(Response::HTTP_OK)
+                    ->respond(['data' =>
+                        $this->postTransformer->transformPostDetailPublic($post_detail,$post_photos)
+
+                    ]);
+            }
+        }
+        else{
+            return $this->respondBadRequest('Post not found');
+
+        }
+
+
+    }
+    private function check_post_id($post_id){
+        $post = Post::whereId($post_id)->first();
+        return !is_null($post);
+
+    }
+
     private function check_tags($tags){
         foreach($tags as $tag) {
             $tag = Tag::whereId($tag)->first();
@@ -128,4 +161,6 @@ class PostsController  extends ApiController
 
         return $photos;
     }
+
+
 }

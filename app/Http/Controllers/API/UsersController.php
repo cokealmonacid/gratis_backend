@@ -76,7 +76,8 @@ class UsersController extends ApiController
 
     public function logout(Request $request)
     {
-        $request->user()->token()->revoke();
+
+        $request->user('api')->token()->revoke();
         return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "Logout success."]);
 
     }

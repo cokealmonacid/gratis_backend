@@ -16,6 +16,7 @@ use Validator;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Str;
+use Socialite;
 
 
 class UsersController extends ApiController
@@ -134,5 +135,15 @@ class UsersController extends ApiController
 
     }
 
+    public function redirectToProvider()
+    {
+        return Socialite::driver('facebook')->stateless()->redirect();
+    }
 
+    public function handleProviderCallback()
+    {
+        $providerUser = Socialite::driver('facebook')->stateless()->user();
+
+        dd($providerUser);
+    }
 }

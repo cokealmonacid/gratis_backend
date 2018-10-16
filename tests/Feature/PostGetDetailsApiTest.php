@@ -30,9 +30,8 @@ class PostGetDetailsApiTest extends TestCase
         $_id_post = $this->getIdPostRandom();
         $response = $this->getJson("api/v1/posts/{$_id_post}");
         $response_user_content = json_decode($response->getContent())->data->user;
-        if (!$this->is_private_params_user($response_user_content)) {
             $response->assertStatus(200);
-        }
+
     }
 
     /** @test */
@@ -42,18 +41,11 @@ class PostGetDetailsApiTest extends TestCase
         $_id_post = $this->getIdPostRandom();
         $response = $this->getJson("api/v1/posts/{$_id_post}");
         $response_user_content = json_decode($response->getContent())->data->user;
+         $response->assertStatus(200);
 
-        if ($this->is_private_params_user($response_user_content)) {
-            $response->assertStatus(200);
 
-        }
     }
 
-    private function is_private_params_user($user_post_details)
-    {
-
-        return isset($user_post_details->phone) && isset($user_post_details->email);
-    }
 
     private function getIdPostRandom()
     {

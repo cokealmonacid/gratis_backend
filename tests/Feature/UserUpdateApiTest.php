@@ -10,7 +10,7 @@ use App\Models\User;
 use Laravel\Passport\Passport;
 
 
-class UserCreateApiTest extends TestCase
+class UserUpdateApiTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 

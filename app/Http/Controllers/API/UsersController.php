@@ -56,22 +56,7 @@ class UsersController extends ApiController
 
     	if ($attempt) {
 
-            $tokenResult = $user->createToken('Personal Access Token');
-            $token = $tokenResult->token;
-
-            if ($request->remember_me) {
-                $token->expires_at = Carbon::now()->addWeeks(1);
-            }
-            $token->save();
-            $_token_data =  [
-            'access_token' => $tokenResult->accessToken,
-            'token_type'   => 'Bearer',
-            'expires_at'   => Carbon::parse(
-                $tokenResult->token->expires_at)
-                ->toDateTimeString() ];
-
-
-    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' =>$_token_data ]);
+    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
     	}
 
     	return $this->respondBadRequest('The email and password dont match');
@@ -142,8 +127,50 @@ class UsersController extends ApiController
 
     public function handleProviderCallback()
     {
-        $providerUser = Socialite::driver('facebook')->stateless()->user();
+        try {
+            $providerUser = Socialite::driver('facebook')->stateless()->user();
+        } catch (Exception $e) {    
+            return $this->respondInternalError();
+        }
 
-        dd($providerUser);
+        $user = User::where('email', $providerUser->getEmail())->first();
+        if ($user) {
+            $user->provider_id = $providerUser->getId();
+            $user->save();
+
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);          
+        }
+
+        $user = User::where('provider_id', $providerUser->getId())->first();
+        if ($user) {
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
+        }
+
+        $user = User::create([
+            'name'          => $providerUser->getName(),
+            'email'         => $providerUser->getEmail(),
+            'provider_id'   => $providerUser->getId()
+        ]);
+
+        if (!$user) {
+            return $this->respondInternalError(); 
+        }
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
+    }
+
+    private function setToken($user) 
+    {
+        $tokenResult = $user->createToken('Personal Access Token');
+        $token = $tokenResult->token;
+        $token->expires_at = Carbon::now()->addWeeks(1);
+
+        $token->save();
+        return $_token_data =  [
+            'access_token' => $tokenResult->accessToken,
+            'token_type'   => 'Bearer',
+            'expires_at'   => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString() 
+        ];
+
     }
 }

@@ -22,7 +22,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'api_token', 'social_token'
+        'name', 'email', 'password', 'api_token', 'phone', 'social_token'
     ];
 
     /**
@@ -34,11 +34,20 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public static function rulesForCreate() {
+    public static function rulesForCreate()
+    {
         return [
-            'email' => 'required|email|unique:users',
+            'email'     => 'required|email|unique:users',
             'password'  => 'required|min:8'
-              ]
-            ;
+        ];
+    }
+
+    public static function rulesForUpdate()
+    {
+
+        return [
+            'email'     => 'email|unique:users',
+            'password'  => 'min:8'
+        ];
     }
 }

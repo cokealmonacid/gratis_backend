@@ -13,6 +13,8 @@ use App\Models\User_Rol;
 use App\Models\Rol;
 use Auth;
 use Validator;
+use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Str;
 
 
@@ -108,6 +110,28 @@ class UsersController extends ApiController
         ]);
 
          return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
+    }
+
+    public function update(Request $request){
+
+        $validator = Validator::make(\Request::all(), User::rulesForUpdate());
+
+        if ($validator->fails()) {
+            $error_message = $validator->errors()->first();
+            return $this->respondFailedParametersValidation($error_message);
+        }
+        $user = $request->user('api');
+        $data_update = $request->input();
+
+        if (isset($data_update['password'])){
+            $data_update['password'] = bcrypt($data_update['password']);
+        }
+
+        $user->update(
+            $data_update
+        );
+        return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
+
     }
 
 

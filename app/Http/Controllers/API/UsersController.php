@@ -100,6 +100,8 @@ class UsersController extends ApiController
 
     public function update(Request $request){
 
+
+
         $validator = Validator::make(\Request::all(), User::rulesForUpdate());
 
         if ($validator->fails()) {
@@ -107,12 +109,11 @@ class UsersController extends ApiController
             return $this->respondFailedParametersValidation($error_message);
         }
         $user = $request->user('api');
-        $data_update = $request->input();
 
+        $data_update= $request->only(['name', 'email', 'password','phone']);
         if (isset($data_update['password'])){
             $data_update['password'] = bcrypt($data_update['password']);
         }
-
         $user->update(
             $data_update
         );

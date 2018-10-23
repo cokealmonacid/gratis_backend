@@ -33,5 +33,9 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
     /** Posts **/
     Route::post('/posts', 'PostsController@store');
 
+    /** User Post */
+    Route::post('users/post/like', 'UsersController@likePost');
+    Route::delete('users/post/like/{user_post_like_id}', 'UsersController@unlikePost');
+
 });
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -10,6 +11,7 @@ use App\Http\Transformers\UserTransformer;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\User_Rol;
+use App\Models\User_Post_Like;
 use App\Models\Rol;
 use Auth;
 use Validator;
@@ -34,7 +36,7 @@ class UsersController extends ApiController
         $this->userTransformer = $userTransformer;
     }
 
-    public function login(Request $request) 
+    public function login(Request $request)
     {
     	$email    = $request->input('email');
     	$password = $request->input('password');
@@ -130,7 +132,7 @@ class UsersController extends ApiController
     {
         try {
             $providerUser = Socialite::driver('facebook')->stateless()->user();
-        } catch (Exception $e) {    
+        } catch (Exception $e) {
             return $this->respondInternalError();
         }
 
@@ -139,7 +141,7 @@ class UsersController extends ApiController
             $user->provider_id = $providerUser->getId();
             $user->save();
 
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);          
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
         }
 
         $user = User::where('provider_id', $providerUser->getId())->first();
@@ -154,13 +156,52 @@ class UsersController extends ApiController
         ]);
 
         if (!$user) {
-            return $this->respondInternalError(); 
+            return $this->respondInternalError();
         }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
     }
+    public function likePost(Request $request){
 
-    private function setToken($user) 
+        $validator = Validator::make(\Request::all(), ['post_id' => 'required']);
+        if($validator->fails()){
+            $error_message = $validator->errors()->first();
+            return $this->respondFailedParametersValidation($error_message);
+        }
+        else {
+            $_post_id = $request->input('post_id');
+            $_post = Post::where('id', $_post_id)->first();
+            if (is_null($_post)) {
+                return $this->respondBadRequest('Post not exist');
+            } else {
+                $user = $request->user('api');
+                $_user_post_like = User_Post_Like::create(
+                    [
+                        'user_id' => $user->id,
+                        'post_id' => $_post_id
+                    ]
+                );
+                return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
+            }
+        }
+
+
+
+    }
+    public function unlikePost($user_post_like_id){
+
+        $_user_post_like_id    = $user_post_like_id;
+        $user_like_post = User_Post_Like::where('id', $_user_post_like_id)->first();
+        if (is_null($user_like_post)){
+            return $this->respondBadRequest('This post like does not exist');
+        }
+        else {
+            $user_like_post->delete();
+            return $this->setStatusCode(Response::HTTP_OK)->respond([]);
+
+        }
+    }
+    private function setToken($user)
     {
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
@@ -170,7 +211,7 @@ class UsersController extends ApiController
         return $_token_data =  [
             'access_token' => $tokenResult->accessToken,
             'token_type'   => 'Bearer',
-            'expires_at'   => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString() 
+            'expires_at'   => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
         ];
 
     }

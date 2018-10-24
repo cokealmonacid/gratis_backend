@@ -75,36 +75,23 @@ class UserPostLikeUnlikeApiTest extends TestCase
     }
 
 
-    /** @test */
-    public function it_throws_user_post_unlike_auth_validation_error()
-    {
 
-        $userPostLike= User_Post_Like::all()->first();
-        $_userPostLike_id = $userPostLike->id;
-
-        $response = $this->deleteJson("api/v1/users/post/like/{$_userPostLike_id}");
-
-        $response->assertStatus(401);
-    }
-    /** @test */
-    public function it_throws_user_post_unlike_id_validation_error()
-    {
-
-        $_userPostLike_id = "SASAS";
-        $response = $this->deleteJson("api/v1/users/post/like/{$_userPostLike_id}");
-
-        $response->assertStatus(401);
-    }
 
     /** @test */
     public function it_throws_user_post_unlike()
     {
-        $this->user_login();
+        $user = $this->user_login();
 
-        $userPostLike= User_Post_Like::all()->first();
-        $_userPostLike_id = $userPostLike->id;
-
-        $response = $this->deleteJson("api/v1/users/post/like/{$_userPostLike_id}");
+        $post= Post::all()->first();
+        User_Post_Like::create(
+            [
+                'user_id' => $user->id,
+                'post_id' => $post->id
+            ]
+        );
+        $response = $this->postJson('api/v1/users/post/like', [
+            "post_id" => "{$post->id}"
+        ]);
 
         $response->assertStatus(200);
     }
@@ -116,5 +103,6 @@ class UserPostLikeUnlikeApiTest extends TestCase
         $user = factory(User::class)->create();
 
         Passport::actingAs($user, ['api']);
+        return $user;
     }
 }

@@ -38,30 +38,30 @@ class UsersController extends ApiController
 
     public function login(Request $request)
     {
-    	$email    = $request->input('email');
-    	$password = $request->input('password');
-    	if (!$email or !$password) {
+        $email = $request->input('email');
+        $password = $request->input('password');
+        if (!$email or !$password) {
             return $this->respondFailedParametersValidation();
-    	}
+        }
 
-    	$user     = User::where('email', $email)->first();
-    	if (!$user) {
-    		return $this->respondBadRequest('This email account does not exist');
-    	}
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            return $this->respondBadRequest('This email account does not exist');
+        }
 
-    	$match_these = ['user_id' => $user->id, 'rol_id' => 1];
-    	$hasRol = User_Rol::where($match_these)->first();
-    	if (!$hasRol) {
-    		return $this->respondBadRequest('This email account does not exist');
-    	}
-    	$attempt = Auth::attempt(['email' => $email, 'password' => $password]);
+        $match_these = ['user_id' => $user->id, 'rol_id' => 1];
+        $hasRol = User_Rol::where($match_these)->first();
+        if (!$hasRol) {
+            return $this->respondBadRequest('This email account does not exist');
+        }
+        $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
 
-    	if ($attempt) {
+        if ($attempt) {
 
-    		return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
-    	}
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+        }
 
-    	return $this->respondBadRequest('The email and password dont match');
+        return $this->respondBadRequest('The email and password dont match');
     }
 
     public function logout(Request $request)
@@ -72,7 +72,8 @@ class UsersController extends ApiController
 
     }
 
-    public function create(Request $request){
+    public function create(Request $request)
+    {
 
         $validator = Validator::make(\Request::all(), User::rulesForCreate());
 
@@ -81,27 +82,27 @@ class UsersController extends ApiController
             return $this->respondFailedParametersValidation($error_message);
         }
 
-        $_email    = $request->input('email');
+        $_email = $request->input('email');
         $_password = $request->input('password');
 
         $user = User::create(
             [
-            'email'     => $_email,
-            'password'  => bcrypt($_password)
+                'email' => $_email,
+                'password' => bcrypt($_password)
             ]
         );
 
         $rol = Rol::where('description', 'user')->first();
         User_rol::create([
             'user_id' => $user->id,
-            'rol_id'  => $rol->id
+            'rol_id' => $rol->id
         ]);
 
-         return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
+        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
     }
 
-    public function update(Request $request){
-
+    public function update(Request $request)
+    {
 
 
         $validator = Validator::make(\Request::all(), User::rulesForUpdate());
@@ -112,8 +113,8 @@ class UsersController extends ApiController
         }
         $user = $request->user('api');
 
-        $data_update= $request->only(['name', 'email', 'password','phone']);
-        if (isset($data_update['password'])){
+        $data_update = $request->only(['name', 'email', 'password', 'phone']);
+        if (isset($data_update['password'])) {
             $data_update['password'] = bcrypt($data_update['password']);
         }
         $user->update(
@@ -141,66 +142,73 @@ class UsersController extends ApiController
             $user->provider_id = $providerUser->getId();
             $user->save();
 
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         }
 
         $user = User::where('provider_id', $providerUser->getId())->first();
         if ($user) {
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         }
 
         $user = User::create([
-            'name'          => $providerUser->getName(),
-            'email'         => $providerUser->getEmail(),
-            'provider_id'   => $providerUser->getId()
+            'name' => $providerUser->getName(),
+            'email' => $providerUser->getEmail(),
+            'provider_id' => $providerUser->getId()
         ]);
 
         if (!$user) {
             return $this->respondInternalError();
         }
 
-        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user) ]);
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
     }
-    public function likePost(Request $request){
+
+    public function likePost(Request $request)
+    {
 
         $validator = Validator::make(\Request::all(), ['post_id' => 'required']);
-        if($validator->fails()){
+        if ($validator->fails()) {
             $error_message = $validator->errors()->first();
             return $this->respondFailedParametersValidation($error_message);
         }
-        else {
-            $_post_id = $request->input('post_id');
-            $_post = Post::where('id', $_post_id)->first();
-            if (is_null($_post)) {
-                return $this->respondBadRequest('Post not exist');
-            } else {
-                $user = $request->user('api');
-                $_user_post_like = User_Post_Like::create(
-                    [
-                        'user_id' => $user->id,
-                        'post_id' => $_post_id
-                    ]
-                );
-                return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
-            }
+        $_post_id = $request->input('post_id');
+        $_post = Post::where('id', $_post_id)->first();
+        if (!$_post) {
+            return $this->respondBadRequest('Post not exist');
         }
+        $user = $request->user('api');
 
+        $user_like_post = User_Post_Like::where('post_id', $_post->id)->where('user_id',$user->id)->first();
 
-
-    }
-    public function unlikePost($user_post_like_id){
-
-        $_user_post_like_id    = $user_post_like_id;
-        $user_like_post = User_Post_Like::where('id', $_user_post_like_id)->first();
-        if (is_null($user_like_post)){
-            return $this->respondBadRequest('This post like does not exist');
-        }
-        else {
+        if ($user_like_post){
             $user_like_post->delete();
             return $this->setStatusCode(Response::HTTP_OK)->respond([]);
-
         }
+        $_user_post_like = User_Post_Like::create(
+            [
+                'user_id' => $user->id,
+                'post_id' => $_post->id
+            ]
+        );
+        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
+
+
     }
+
+    private function unlikePost($user_post_like_id)
+    {
+
+        $_user_post_like_id = $user_post_like_id;
+        $user_like_post = User_Post_Like::where('id', $_user_post_like_id)->first();
+        if (!$user_like_post) {
+            return $this->respondBadRequest('This post like does not exist');
+        }
+        $user_like_post->delete();
+        return $this->setStatusCode(Response::HTTP_OK)->respond([]);
+
+
+    }
+
     private function setToken($user)
     {
         $tokenResult = $user->createToken('Personal Access Token');
@@ -208,10 +216,10 @@ class UsersController extends ApiController
         $token->expires_at = Carbon::now()->addWeeks(1);
 
         $token->save();
-        return $_token_data =  [
+        return $_token_data = [
             'access_token' => $tokenResult->accessToken,
-            'token_type'   => 'Bearer',
-            'expires_at'   => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
+            'token_type' => 'Bearer',
+            'expires_at' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
         ];
 
     }

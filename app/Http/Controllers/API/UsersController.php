@@ -165,17 +165,18 @@ class UsersController extends ApiController
 
     public function likePost(Request $request)
     {
-
         $validator = Validator::make(\Request::all(), ['post_id' => 'required']);
         if ($validator->fails()) {
             $error_message = $validator->errors()->first();
             return $this->respondFailedParametersValidation($error_message);
         }
+
         $_post_id = $request->input('post_id');
         $_post = Post::where('id', $_post_id)->first();
         if (!$_post) {
             return $this->respondBadRequest('Post not exist');
         }
+
         $user = $request->user('api');
 
         $user_like_post = User_Post_Like::where('post_id', $_post->id)->where('user_id',$user->id)->first();
@@ -184,27 +185,15 @@ class UsersController extends ApiController
             $user_like_post->delete();
             return $this->setStatusCode(Response::HTTP_OK)->respond([]);
         }
+
         $_user_post_like = User_Post_Like::create(
             [
                 'user_id' => $user->id,
                 'post_id' => $_post->id
             ]
         );
+
         return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
-
-
-    }
-
-    private function unlikePost($user_post_like_id)
-    {
-
-        $_user_post_like_id = $user_post_like_id;
-        $user_like_post = User_Post_Like::where('id', $_user_post_like_id)->first();
-        if (!$user_like_post) {
-            return $this->respondBadRequest('This post like does not exist');
-        }
-        $user_like_post->delete();
-        return $this->setStatusCode(Response::HTTP_OK)->respond([]);
 
 
     }

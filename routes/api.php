@@ -22,7 +22,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 
 	/** Posts **/
     Route::get('/posts/public', 'PostsController@index');
-    Route::get('/posts/{id}', 'PostsController@getPost');
+    Route::get('/posts/{id}', 'PostsController@show');
 });
 
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {

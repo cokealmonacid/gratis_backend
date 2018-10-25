@@ -135,7 +135,7 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
-    public function getPost($id , Request $request) 
+    public function show($id , Request $request) 
     {
         if ($this->check_post_id($id)) {
             $post_detail = Post::getDetailPost($id);

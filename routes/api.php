@@ -32,6 +32,7 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
 
     /** Posts **/
     Route::post('/posts', 'PostsController@store');
+    Route::put('/posts/{id}', 'PostsController@update');
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');

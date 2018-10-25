@@ -9,7 +9,6 @@ use Laravel\Passport\Passport;
 use App\Models\Provincia;
 use App\Models\Tag;
 use App\Models\User;
-use Hash;
 
 class PostCreateApiTest extends TestCase
 {

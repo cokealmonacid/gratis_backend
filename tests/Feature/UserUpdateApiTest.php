@@ -104,7 +104,7 @@ class UserUpdateApiTest extends TestCase
         $this->user_login();
 
         $_email     = $this->faker->freeEmail();
-        $_password  = $this->faker->password();
+        $_password  = $this->faker->password(8, 20);
         $_name      = $this->faker->name();
         $_phone     = $this->faker->phoneNumber();
 
@@ -127,7 +127,7 @@ class UserUpdateApiTest extends TestCase
         $this->user_login();
 
         $_email     = $this->faker->freeEmail();
-        $_password  = $this->faker->password();
+        $_password  = $this->faker->password(8, 20);
         $_name      = $this->faker->name();
         $_phone     = $this->faker->phoneNumber();
 

@@ -22,7 +22,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 
 	/** Posts **/
     Route::get('/posts/public', 'PostsController@index');
-    Route::get('/posts/{id}', 'PostsController@getPost');
+    Route::get('/posts/{id}', 'PostsController@show');
 });
 
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {
@@ -32,6 +32,7 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
 
     /** Posts **/
     Route::post('/posts', 'PostsController@store');
+    Route::put('/posts/{id}', 'PostsController@update');
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');

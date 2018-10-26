@@ -194,8 +194,6 @@ class UsersController extends ApiController
         );
 
         return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
-
-
     }
 
     private function setToken($user)
@@ -210,6 +208,5 @@ class UsersController extends ApiController
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
         ];
-
     }
 }

@@ -218,7 +218,7 @@ class PostsController  extends ApiController
 
         $user_likes = User_Post_Like::where('user_id', $user->id)->pluck('post_id');
         if (!$user_likes) {
-            return $this->setStatusCode(Response::HTTP_OK)->respond([]);
+            return $this->setStatusCode(Response::HTTP_OK)->respond('data' => []);
         }
 
         $favourites = Collect();

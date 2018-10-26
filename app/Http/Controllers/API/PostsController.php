@@ -117,6 +117,11 @@ class PostsController  extends ApiController
             return $this->respondBadRequest('This post does not exist');
         }
 
+        $user = Auth::guard('api')->user();
+        if ($post->user_id != $user->id) {
+            return $this->respondForbidden();
+        }
+
         $post->title        = $request->input('title');
         $post->description  = $request->input('description');
         $post->provincia_id = $provincia->id;

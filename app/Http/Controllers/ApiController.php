@@ -117,4 +117,14 @@ class ApiController extends Controller
 		return $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR)
 			->respondWithError($message);
 	}
+
+	/**
+	 * @param string $message
+	 * @return \Illuminate\Contracts\Routing\ResponseFactory|\Symfony\Component\HttpFoundation\Response
+     */
+	public function respondForbidden($message = 'Not allowed to access this resource')
+	{
+		return $this->setStatusCode(Response::HTTP_FORBIDDEN)
+			->respondWithError($message);
+	}
 }

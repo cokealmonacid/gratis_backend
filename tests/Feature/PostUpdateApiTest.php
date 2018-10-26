@@ -18,9 +18,9 @@ class PostUpdateApiTest extends TestCase
     /** @test */
     public function it_throws_post_validtion_error()
     {
-      	$this->user_login();
+      $this->user_login();
 
-      	$post_id = Post::first()->id;
+      $post_id = Post::first()->id;
 
   		$response = $this->putJson('api/v1/posts/' . $post_id, []);
 
@@ -30,19 +30,19 @@ class PostUpdateApiTest extends TestCase
     /** @test */
     public function it_throws_tag_validation_error()
     {
-      	$this->user_login(); 
+      $this->user_login(); 
 
-      	$post_id = Post::first()->id;
+      $post_id = Post::first()->id;
 
 	    $data = [
-	      	'title'        => $this->faker->words,
-	      	'description'  => $this->faker->text($maxNbChars = 200),
-	      	'provincia_id' => Provincia::first()->id,
-	      	'tags'         => $this->faker->words($nb = 3, $asText = false),
-	      	'photos'       => $this->faker->words($nb = 3, $asText = false)  
+	      'title'        => $this->faker->words,
+	      'description'  => $this->faker->text($maxNbChars = 200),
+	      'provincia_id' => Provincia::first()->id,
+	      'tags'         => $this->faker->words($nb = 3, $asText = false),
+	      'photos'       => $this->faker->words($nb = 3, $asText = false)  
 	    ];
 
-     	 $response = $this->putJson('api/v1/posts/' . $post_id, $data);
+     	$response = $this->putJson('api/v1/posts/' . $post_id, $data);
 
   		$response->assertStatus(422);
     } 
@@ -50,9 +50,9 @@ class PostUpdateApiTest extends TestCase
     /** @test */
     public function it_throws_image_validation_error()
     {
-      	$this->user_login(); 
+      $this->user_login(); 
 
-      	$post_id = Post::first()->id;
+      $post_id = Post::first()->id;
 
     	$data = [
     		'title'        => $this->faker->text($maxNbChars = 20),
@@ -62,30 +62,29 @@ class PostUpdateApiTest extends TestCase
     		'photos'       => $this->faker->words($nb = 3, $asText = false)  
     	];
 
-		$response = $this->putJson('api/v1/posts/' . $post_id, $data);
+		  $response = $this->putJson('api/v1/posts/' . $post_id, $data);
 
-
-		$response->assertStatus(422);
+  		$response->assertStatus(422);
     }
 
     /** @test */
     public function it_throws_provincia_validation_error()
     {
-      	$this->user_login();
+      $this->user_login();
 
-      	$post_id = Post::first()->id;
+      $post_id = Post::first()->id;
 
-      	$data = [
-         	'title'        => $this->faker->text($maxNbChars = 20),
-         	'description'  => $this->faker->text($maxNbChars = 200),
-         	'provincia_id' => 0,
-         	'tags'         => [ Tag::first()->id ],
-         	'photos'       => [ $this->create_image() ]
-      	];
+      $data = [
+         'title'        => $this->faker->text($maxNbChars = 20),
+         'description'  => $this->faker->text($maxNbChars = 200),
+         'provincia_id' => 0,
+         'tags'         => [ Tag::first()->id ],
+         'photos'       => [ $this->create_image() ]
+      ];
 
-		$response = $this->putJson('api/v1/posts/' . $post_id, $data);
+		  $response = $this->putJson('api/v1/posts/' . $post_id, $data);
 
-      	$response->assertStatus(422);
+      $response->assertStatus(422);
     }
 
     /** @test */
@@ -93,62 +92,88 @@ class PostUpdateApiTest extends TestCase
     {
      	$this->user_login();
 
-      	$post_id = $this->faker->word;
+      $post_id = $this->faker->word;
 
-      	$data = [
-          	'title'        => $this->faker->text($maxNbChars = 20),
-          	'description'  => $this->faker->text($maxNbChars = 200),
-          	'provincia_id' => Provincia::first()->id,
-          	'tags'         => [ Tag::first()->id ],
-          	'photos'       => [ $this->create_image() ]
-      	];
-
-      	$response = $this->putJson('api/v1/posts/' . $post_id, $data);
-
-      	$response->assertStatus(400);
-    }
-
-    /** @test */
-    public function it_update_post()
-    {
-      	$this->user_login();
-
-      	$post_id = Post::first()->id;
-
-      	$data = [
+    	$data = [
         	'title'        => $this->faker->text($maxNbChars = 20),
         	'description'  => $this->faker->text($maxNbChars = 200),
         	'provincia_id' => Provincia::first()->id,
         	'tags'         => [ Tag::first()->id ],
         	'photos'       => [ $this->create_image() ]
-      	];
+    	];
 
-       $response = $this->putJson('api/v1/posts/' . $post_id, $data);
+    	$response = $this->putJson('api/v1/posts/' . $post_id, $data);
 
-       $response->assertStatus(200);
+    	$response->assertStatus(400);
+    }
+
+    /** @test */
+    public function it_throws_user_forbidden_update()
+    {
+      $user = factory(User::class)->create();
+
+      $this->user_login($user);
+
+      $post = Post::where('user_id', '!=', $user->id)->first();
+
+      $data = [
+        'title'        => $this->faker->text($maxNbChars = 20),
+        'description'  => $this->faker->text($maxNbChars = 200),
+        'provincia_id' => Provincia::first()->id,
+        'tags'         => [ Tag::first()->id ],
+        'photos'       => [ $this->create_image() ]
+      ];
+
+      $response = $this->putJson('api/v1/posts/' . $post->id, $data);
+
+      $response->assertStatus(403);
+    }
+
+    /** @test */
+    public function it_update_post()
+    {
+      $post = Post::first();
+
+      $user = User::whereId($post->user_id)->first();
+
+      $this->user_login($user);      
+
+    	$data = [
+      	'title'        => $this->faker->text($maxNbChars = 20),
+      	'description'  => $this->faker->text($maxNbChars = 200),
+      	'provincia_id' => Provincia::first()->id,
+      	'tags'         => [ Tag::first()->id ],
+      	'photos'       => [ $this->create_image() ]
+    	];
+
+      $response = $this->putJson('api/v1/posts/' . $post->id, $data);
+
+      $response->assertStatus(200);
     }
 
 
-    private function user_login()
+    private function user_login($user = null)
     {
+      if (!$user) {
         $user = factory(User::class)->create();
+      }
 
-        Passport::actingAs($user,['api']); 
+      Passport::actingAs($user,['api']); 
     }
 
     private function create_image()
     {
-        $path = base_path() . '/tests/data/images.jpeg';
- 
-        TestCase::assertFileExists($path);
+      $path = base_path() . '/tests/data/images.jpeg';
 
-        $image = \Image::make($path)->encode('data-url');
+      TestCase::assertFileExists($path);
 
-        return [
-            'content'   => explode(",", (string) $image)[1],
-            'extension' => $image->mime,
-            'principal' => false
-        ];
+      $image = \Image::make($path)->encode('data-url');
+
+      return [
+          'content'   => explode(",", (string) $image)[1],
+          'extension' => $image->mime,
+          'principal' => false
+      ];
     }
 }
 

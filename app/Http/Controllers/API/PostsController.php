@@ -34,6 +34,8 @@ class PostsController  extends ApiController
     public function index(Request $request)
     {
         $_page    = $request->input('page');
+
+
         if (!is_null($_page) && !is_numeric($_page) ) {
             return $this->respondFailedParametersValidation();
         }
@@ -43,6 +45,30 @@ class PostsController  extends ApiController
             ->join('photos', 'photos.post_id', '=', 'posts.id')
             ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
 
+        return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
+    }
+
+    public function getPosts(Request $request) {
+
+        $_page    = $request->input('page');
+        $_name = $request->input('title');
+        $_region = $request->input('region');
+        $_provincia = $request->input('provincia');
+        $_tags =  $request->input('tags');
+        //TODO validar informacion
+        if (!is_null($_page) && !is_numeric($_page) ) {
+            return $this->respondFailedParametersValidation();
+        }
+
+        $_posts = Post::where('state_id','=',1)
+            ->where('title', 'like', '%' . $_name . '%')
+            ->whereRaw("(provincia_id = '{$_provincia}' or '{$_provincia}' = '' )")
+            ->whereRaw("(regiones.id = '{$_region}' or '{$_region}' = '' )")
+            ->groupBy('posts.id')
+            ->join('photos', 'photos.post_id', '=', 'posts.id')
+            ->join('provincias','posts.provincia_id','=','provincias.id')
+            ->join('regiones','provincias.region_id','=','regiones.id')
+            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 

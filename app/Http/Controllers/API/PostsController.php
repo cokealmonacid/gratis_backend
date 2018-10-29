@@ -52,22 +52,25 @@ class PostsController  extends ApiController
 
         $_page    = $request->input('page');
         $_name = $request->input('title');
-        $_region = $request->input('region');
-        $_provincia = $request->input('provincia');
-        $_tags =  $request->input('tags');
-        //TODO validar informacion
-        if (!is_null($_page) && !is_numeric($_page) ) {
-            return $this->respondFailedParametersValidation();
+        $_region_id = $request->input('region_id');
+        $_provincia_id = $request->input('provincia_id');
+        $_tag_id =  $request->input('tag_id');
+
+        $validator = Validator::make($request->all(), Post::rulesGetFilter());
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation($validator->errors()->first());
         }
 
         $_posts = Post::where('state_id','=',1)
             ->where('title', 'like', '%' . $_name . '%')
-            ->whereRaw("(provincia_id = '{$_provincia}' or '{$_provincia}' = '' )")
-            ->whereRaw("(regiones.id = '{$_region}' or '{$_region}' = '' )")
+            ->whereRaw("(provincia_id = '{$_region_id}' or '{$_region_id}' = '' )")
+            ->whereRaw("(regiones.id = '{$_provincia_id}' or '{$_provincia_id}' = '' )")
+            ->whereRaw("(post_tags.tag_id = '{$_tag_id}' or '{$_tag_id}' = '' )")
             ->groupBy('posts.id')
             ->join('photos', 'photos.post_id', '=', 'posts.id')
             ->join('provincias','posts.provincia_id','=','provincias.id')
             ->join('regiones','provincias.region_id','=','regiones.id')
+            ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
             ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }

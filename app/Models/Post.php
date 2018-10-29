@@ -56,7 +56,17 @@ class Post extends Model
             'description'   => 'required|max:255',
             'provincia_id'  => 'required|min:1',
             'tags'          => 'required|array',
-            'photos'        => 'required|array'        
+            'photos'        => 'required|array'
+        ];
+    }
+    public static function rulesGetFilter(){
+        return [
+            'title'         => 'nullable|max:255',
+            'region_id'   => 'nullable|numeric',
+            'provincia_id'  => 'nullable|numeric',
+            'tag_id'          => 'nullable|numeric',
+            'page'          => 'nullable|numeric',
+
         ];
     }
 }

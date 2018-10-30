@@ -20,10 +20,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $_page = $this->faker->word();
 
         $_body = [
-          "title" => "",
-          "provincia_id"  => "",
-          "region_id" => "",
-          "tag_id" => "",
+          "title"           => "",
+          "provincia_id"    => "",
+          "region_id"       => "",
+          "tag_id"          => "",
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
@@ -36,10 +36,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $_page = 1;
 
         $_body = [
-            "title" => "",
+            "title"         => "",
             "provincia_id"  => $this->faker->word(),
-            "region_id" => "",
-            "tag_id" => "",
+            "region_id"     => "",
+            "tag_id"        => "",
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
@@ -52,10 +52,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $_page = 1;
 
         $_body = [
-            "title" => "",
+            "title"         => "",
             "provincia_id"  => "",
-            "region_id" => $this->faker->word(),
-            "tag_id" => "",
+            "region_id"     => $this->faker->word(),
+            "tag_id"        => "",
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
@@ -68,10 +68,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $_page = 1;
 
         $_body = [
-            "title" => "",
+            "title"         => "",
             "provincia_id"  => "",
-            "region_id" => "",
-            "tag_id" => $this->faker->word(),
+            "region_id"     => "",
+            "tag_id"        => $this->faker->word(),
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
@@ -84,10 +84,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $_page = 1;
 
         $_body = [
-            "title" => "",
+            "title"         => "",
             "provincia_id"  => "",
-            "region_id" => "",
-            "tag_id" => "",
+            "region_id"     => "",
+            "tag_id"        => "",
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
@@ -113,10 +113,10 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $provincia = Provincia::inRandomOrder()->first();
 
         $_body = [
-            "title" => $this->faker->word(),
+            "title"         => $this->faker->word(),
             "provincia_id"  => $provincia->id,
-            "region_id" => $region->id,
-            "tag_id" => $post_tag->tag_id
+            "region_id"     => $region->id,
+            "tag_id"        => $post_tag->tag_id
         ];
 
         $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);

@@ -25,8 +25,8 @@ class PostTagsTableSeeder extends Seeder
     		$post       = Post::inRandomOrder()->first();
 
     		Post_Tags::create([
-    			'post_id'      => $post->id,
-    			'tag_id'     => $tag->id
+    			'post_id'       => $post->id,
+    			'tag_id'        => $tag->id
             ]);
     	}
     }

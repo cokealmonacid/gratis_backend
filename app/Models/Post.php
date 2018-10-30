@@ -62,9 +62,9 @@ class Post extends Model
     public static function rulesGetFilter(){
         return [
             'title'         => 'nullable|max:255',
-            'region_id'   => 'nullable|numeric',
+            'region_id'     => 'nullable|numeric',
             'provincia_id'  => 'nullable|numeric',
-            'tag_id'          => 'nullable|numeric',
+            'tag_id'        => 'nullable|numeric',
             'page'          => 'nullable|numeric',
 
         ];

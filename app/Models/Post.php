@@ -28,26 +28,6 @@ class Post extends Model
         'publish_date'
     ];
 
-    public static function getDetailPost($post_id) {
-        $post_details = Post::whereId($post_id)
-            ->first()
-            ->join('users','users.id', '=' ,'posts.user_id')
-            ->select(
-                'users.id as user_id'
-                ,'users.name as user_name'
-                ,'users.phone as user_phone'
-                ,'users.avatar as user_avatar'
-                ,'users.email as user_email'
-                ,'posts.id as post_id'
-                ,'posts.title as post_title'
-                ,'posts.description as post_description'
-
-            )
-            ->first();
-
-        return $post_details;
-
-    }
 
 
     public static function rules(){
@@ -59,7 +39,7 @@ class Post extends Model
             'photos'        => 'required|array'
         ];
     }
-    public static function rulesGetFilter(){
+    public static function rulesFilter(){
         return [
             'title'         => 'nullable|max:255',
             'region_id'     => 'nullable|numeric',

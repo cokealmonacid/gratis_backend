@@ -48,15 +48,16 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 
-    public function getPosts(Request $request) {
+    public function showPosts(Request $request) {
 
+        $data_filter    =$request->only('title', 'region_id', 'provincia_id','tag_id');
         $_page          = $request->input('page');
         $_name          = $request->input('title');
         $_region_id     = $request->input('region_id');
         $_provincia_id  = $request->input('provincia_id');
         $_tag_id        =  $request->input('tag_id');
 
-        $validator = Validator::make($request->all(), Post::rulesGetFilter());
+        $validator = Validator::make($request->all(), Post::rulesFilter());
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
@@ -71,7 +72,8 @@ class PostsController  extends ApiController
             ->join('provincias','posts.provincia_id','=','provincias.id')
             ->join('regiones','provincias.region_id','=','regiones.id')
             ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
+            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page)
+            ->appends( $data_filter );
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 
@@ -172,7 +174,24 @@ class PostsController  extends ApiController
     public function show($id , Request $request) 
     {
         if ($this->check_post_id($id)) {
-            $post_detail = Post::getDetailPost($id);
+
+            $post_detail = Post::whereId($id)
+                ->first()
+                ->join('users','users.id', '=' ,'posts.user_id')
+                ->select(
+                    'users.id as user_id'
+                    ,'users.name as user_name'
+                    ,'users.phone as user_phone'
+                    ,'users.avatar as user_avatar'
+                    ,'users.email as user_email'
+                    ,'posts.id as post_id'
+                    ,'posts.title as post_title'
+                    ,'posts.description as post_description'
+
+                )
+                ->first();
+
+
             $post_photos = Photo::where('post_id' ,'=', $id)->get();
             if ( $request->user('api') ) {
                 return $this

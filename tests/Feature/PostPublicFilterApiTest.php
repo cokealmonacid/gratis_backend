@@ -19,30 +19,33 @@ class PostPublicFilterApiTestApiTest extends TestCase
     {
         $_page = $this->faker->word();
 
-        $_body = [
+        $_params = [
           "title"           => "",
           "provincia_id"    => "",
           "region_id"       => "",
           "tag_id"          => "",
+          "page"            => $_page
         ];
-
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(422);
     }
 
     /** @test */
-    public function it_throws_get_posts_provincia_id__validation_error()
+    public function it_throws_get_posts_provincia_id_validation_error()
     {
         $_page = 1;
 
-        $_body = [
+        $_params = [
             "title"         => "",
             "provincia_id"  => $this->faker->word(),
             "region_id"     => "",
             "tag_id"        => "",
+            "page"            => $_page
         ];
 
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(422);
     }
 
@@ -51,14 +54,16 @@ class PostPublicFilterApiTestApiTest extends TestCase
     {
         $_page = 1;
 
-        $_body = [
+        $_params = [
             "title"         => "",
             "provincia_id"  => "",
             "region_id"     => $this->faker->word(),
             "tag_id"        => "",
+            "page"          => $_page
         ];
 
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(422);
     }
 
@@ -67,14 +72,16 @@ class PostPublicFilterApiTestApiTest extends TestCase
     {
         $_page = 1;
 
-        $_body = [
+        $_params = [
             "title"         => "",
             "provincia_id"  => "",
             "region_id"     => "",
             "tag_id"        => $this->faker->word(),
+            "page"          => $_page
         ];
 
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(422);
     }
 
@@ -83,14 +90,16 @@ class PostPublicFilterApiTestApiTest extends TestCase
     {
         $_page = 1;
 
-        $_body = [
+        $_params = [
             "title"         => "",
             "provincia_id"  => "",
             "region_id"     => "",
             "tag_id"        => "",
+            "page"          => $_page
         ];
 
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(200);
     }
 
@@ -99,7 +108,7 @@ class PostPublicFilterApiTestApiTest extends TestCase
     {
 
 
-        $response = $this->postJson("api/v1/posts/public",[]);
+        $response = $this->getJson("api/v1/posts/public",[]);
         $response->assertStatus(200);
     }
 
@@ -112,14 +121,16 @@ class PostPublicFilterApiTestApiTest extends TestCase
         $region= Region::inRandomOrder()->first();
         $provincia = Provincia::inRandomOrder()->first();
 
-        $_body = [
+        $_params = [
             "title"         => $this->faker->word(),
             "provincia_id"  => $provincia->id,
             "region_id"     => $region->id,
-            "tag_id"        => $post_tag->tag_id
+            "tag_id"        => $post_tag->tag_id,
+            "page"            => $_page
         ];
 
-        $response = $this->postJson("api/v1/posts/public?page={$_page}", $_body);
+        $_http_params = http_build_query($_params);
+        $response = $this->getJson("api/v1/posts/public?{$_http_params}");
         $response->assertStatus(200);
     }
 }

@@ -50,17 +50,17 @@ class PostsController  extends ApiController
 
     public function showPosts(Request $request) {
 
+        $validator = Validator::make($request->all(), Post::rulesFilter());
+
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation($validator->errors()->first());
+        }
         $data_filter    =$request->only('title', 'region_id', 'provincia_id','tag_id');
         $_page          = $request->input('page');
         $_name          = $request->input('title');
         $_region_id     = $request->input('region_id');
         $_provincia_id  = $request->input('provincia_id');
         $_tag_id        =  $request->input('tag_id');
-
-        $validator = Validator::make($request->all(), Post::rulesFilter());
-        if ($validator->fails()) {
-            return $this->respondFailedParametersValidation($validator->errors()->first());
-        }
 
         $_posts = Post::where('state_id','=',1)
             ->where('title', 'like', '%' . $_name . '%')

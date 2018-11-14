@@ -21,7 +21,6 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
     Route::post('/users', 'UsersController@create');
 
 	/** Posts **/
-   // Route::get('/posts/public', 'PostsController@index');
     Route::get('/posts/public', 'PostsController@showPosts');
     Route::get('/posts/{id}', 'PostsController@show');
 });
@@ -34,9 +33,9 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
     /** Posts **/
     Route::post('/posts', 'PostsController@store');
     Route::put('/posts/{id}', 'PostsController@update');
+    Route::get('/favourites', 'PostsController@favourites');
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');
-
 });
 

@@ -9,6 +9,7 @@ use App\Http\Transformers\PostTransformer;
 use App\Models\Photo;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\User_Post_Like;
 use App\Models\Post_Tags;
 use App\Models\Provincia;
 use App\Models\Tag;
@@ -211,8 +212,25 @@ class PostsController  extends ApiController
         }
     }
 
-    private function check_post_id($post_id)
+    public function favourites(Request $request)
     {
+        $user = $request->user('api');
+
+        $user_likes = User_Post_Like::where('user_id', $user->id)->pluck('post_id');
+        if (!$user_likes) {
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => null]);
+        }
+
+        $favourites = Collect();
+        foreach ($user_likes as $like) {
+            $post = Post::whereId($like)->first();
+            $favourites->push($this->postTransformer->transform($post));
+        }
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
+    }
+
+    private function check_post_id($post_id){
         $post = Post::whereId($post_id)->first();
         return !is_null($post);
     }
@@ -267,5 +285,4 @@ class PostsController  extends ApiController
             ]);
         }   
     }
-
 }

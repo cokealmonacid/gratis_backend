@@ -28,7 +28,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {
     /** Users  */
     Route::post('/users/logout', 'UsersController@logout');
+    Route::get('/users', 'UsersController@show');
     Route::put('/users', 'UsersController@update');
+    Route::put('/users/avatar', 'UsersController@updateAvatar');
 
     /** Posts **/
     Route::post('/posts', 'PostsController@store');

@@ -72,6 +72,13 @@ class UsersController extends ApiController
 
     }
 
+    public function show(Request $request)
+    {
+        $user = $request->user('api');
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
+    }
+
     public function create(Request $request)
     {
 
@@ -103,8 +110,6 @@ class UsersController extends ApiController
 
     public function update(Request $request)
     {
-
-
         $validator = Validator::make(\Request::all(), User::rulesForUpdate());
 
         if ($validator->fails()) {
@@ -121,6 +126,10 @@ class UsersController extends ApiController
             $data_update
         );
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
+    }
+
+    public function updateAvatar(Request $request)
+    {
 
     }
 

@@ -128,11 +128,6 @@ class UsersController extends ApiController
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
     }
 
-    public function updateAvatar(Request $request)
-    {
-
-    }
-
     public function redirectToProvider()
     {
         return Socialite::driver('facebook')->stateless()->redirect();

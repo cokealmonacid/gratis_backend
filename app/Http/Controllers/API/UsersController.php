@@ -105,7 +105,7 @@ class UsersController extends ApiController
             'rol_id' => $rol->id
         ]);
 
-        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
+        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
 
     public function update(Request $request)
@@ -126,6 +126,22 @@ class UsersController extends ApiController
             $data_update
         );
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        $validator = Validator::make(\Request::all(), User::rulesForAvatar());
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation();
+        }
+
+        $user = $request->user('api');
+        $user->avatar = $request->input('avatar');
+        if (!$user->save()) {
+            return $this->respondInternalError();
+        }
+
+        return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
 
     public function redirectToProvider()

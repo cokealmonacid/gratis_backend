@@ -44,10 +44,16 @@ class User extends Authenticatable
 
     public static function rulesForUpdate()
     {
-
         return [
             'email'     => 'email|unique:users',
             'password'  => 'min:8'
+        ];
+    }
+
+    public static function rulesForAvatar()
+    {
+        return [
+            'avatar'    => 'required|imageable',
         ];
     }
 }

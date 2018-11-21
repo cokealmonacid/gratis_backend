@@ -13,4 +13,14 @@ class UserTransformer extends Transformer {
 			'email'     => $user['email']
         ];
 	}
+
+	public function transformUserDetail($user)
+	{
+		return [
+			'name'      => $user['name'],
+			'email'     => $user['email'],
+			'avatar'    => $user['avatar'],
+			'phone'     => $user['phone'],
+		];
+	}
 }

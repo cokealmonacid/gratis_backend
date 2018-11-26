@@ -280,7 +280,6 @@ class PostsController  extends ApiController
                 'post_id'   => $post_id,
                 'image'     => $photo['content'],
                 'thumbnail' => Photo::createThumbnail($photo['content']),
-                'extension' => $photo['extension'],
                 'principal' => $photo['principal']
             ]);
         }   

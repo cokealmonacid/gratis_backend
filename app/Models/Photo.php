@@ -30,15 +30,13 @@ class Photo extends Model
     public static function rules(){
         return [
             'content'         => 'required|imageable',
-            'extension'       => 'required',
             'principal'       => 'required',        
         ];
     }
 
     public static function createThumbnail($image){
-        $originalImage = base64_decode($image);
+        $originalImage = base64_decode(explode(",", $image)[1]);
         $encodedImage  = (string) \Image::make($originalImage)->resize(180, 180)->encode('data-url');
-        $thumbnail     = explode(",", $encodedImage)[1];
-        return $thumbnail;
+        return $encodedImage;
     }
 }

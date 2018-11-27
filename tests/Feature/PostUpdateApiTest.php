@@ -163,17 +163,16 @@ class PostUpdateApiTest extends TestCase
 
     private function create_image()
     {
-      $path = base_path() . '/tests/data/images.jpeg';
+        $path = base_path() . '/tests/data/images.jpeg';
+ 
+        TestCase::assertFileExists($path);
 
-      TestCase::assertFileExists($path);
+        $image = \Image::make($path)->encode('data-url');
 
-      $image = \Image::make($path)->encode('data-url');
-
-      return [
-          'content'   => explode(",", (string) $image)[1],
-          'extension' => $image->mime,
-          'principal' => false
-      ];
+        return [
+            'content'   => (string)$image,
+            'principal' => false
+        ];
     }
 }
 

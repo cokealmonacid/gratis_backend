@@ -112,8 +112,7 @@ class PostCreateApiTest extends TestCase
         $image = \Image::make($path)->encode('data-url');
 
         return [
-            'content'   => explode(",", (string) $image)[1],
-            'extension' => $image->mime,
+            'content'   => (string)$image,
             'principal' => false
         ];
     }

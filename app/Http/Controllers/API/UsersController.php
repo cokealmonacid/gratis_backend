@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Repositories\UserRepository as UseRepo ;
+use Exception;
+
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-
 use App\Http\Controllers\ApiController;
 use App\Http\Transformers\UserTransformer;
+use Laravel\Passport\Bridge\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
 use App\Models\User_Rol;
@@ -27,41 +30,42 @@ class UsersController extends ApiController
      * @var UserTransformer
      */
     protected $userTransformer;
+    /**
+     * @var UserRepository
+     */
+    private $userRepository;
 
     /**
      * @param UserTransformer $userTransformer
      */
-    function __construct(UserTransformer $userTransformer)
+    function __construct(UserTransformer $userTransformer,UseRepo $userRepository)
     {
         $this->userTransformer = $userTransformer;
+        $this->userRepository = $userRepository;
     }
 
     public function login(Request $request)
     {
-        $email = $request->input('email');
-        $password = $request->input('password');
-        if (!$email or !$password) {
-            return $this->respondFailedParametersValidation();
-        }
+            $email = $request->input('email');
+            $password = $request->input('password');
+            if (!$email or !$password) {
+                return $this->respondFailedParametersValidation();
+            }
+        try {
+            $user_rol = 1;
+            $user = $this->userRepository->getUserWithMailRol($email, $user_rol);
+            $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
 
-        $user = User::where('email', $email)->first();
-        if (!$user) {
-            return $this->respondBadRequest('This email account does not exist');
-        }
+            if ($attempt) {
 
-        $match_these = ['user_id' => $user->id, 'rol_id' => 1];
-        $hasRol = User_Rol::where($match_these)->first();
-        if (!$hasRol) {
-            return $this->respondBadRequest('This email account does not exist');
-        }
-        $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
+                return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+            }
 
-        if ($attempt) {
-
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
-        }
-
-        return $this->respondBadRequest('The email and password dont match');
+            return $this->respondBadRequest('The email and password dont match');
+            }
+        catch  (Exception $e) {
+            return $this->respondBadRequest($e->getMessage());
+            }
     }
 
     public function logout(Request $request)
@@ -75,7 +79,6 @@ class UsersController extends ApiController
     public function show(Request $request)
     {
         $user = $request->user('api');
-
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
 

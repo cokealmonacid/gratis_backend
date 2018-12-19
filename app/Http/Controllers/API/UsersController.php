@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Repositories\UserRepository as UseRepo ;
 use Exception;
 
-use App\Models\Post;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Http\Controllers\ApiController;
@@ -13,9 +12,7 @@ use App\Http\Transformers\UserTransformer;
 use Laravel\Passport\Bridge\UserRepository;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\User;
-use App\Models\User_Rol;
-use App\Models\User_Post_Like;
-use App\Models\Rol;
+
 use Auth;
 use Validator;
 use Illuminate\Support\Facades\DB;
@@ -52,8 +49,8 @@ class UsersController extends ApiController
                 return $this->respondFailedParametersValidation();
             }
         try {
-            $user_rol = 1;
-            $user = $this->userRepository->getUserWithMailRol($email, $user_rol);
+            $user_rol = 'user';
+            $user = $this->userRepository->getWithMailRol($email, $user_rol);
             $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
 
             if ($attempt) {
@@ -95,18 +92,12 @@ class UsersController extends ApiController
         $_email = $request->input('email');
         $_password = $request->input('password');
 
-        $user = User::create(
-            [
-                'email' => $_email,
-                'password' => bcrypt($_password)
-            ]
-        );
-
-        $rol = Rol::where('description', 'user')->first();
-        User_rol::create([
-            'user_id' => $user->id,
-            'rol_id' => $rol->id
-        ]);
+        try {
+            $user = $this->userRepository->addUser(['email' => $_email, 'password' => bcrypt($_password)], 'user');
+        }
+        catch (Exception $e){
+            return $this->respondBadRequest($e->getMessage());
+        }
 
         return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
@@ -119,15 +110,11 @@ class UsersController extends ApiController
             $error_message = $validator->errors()->first();
             return $this->respondFailedParametersValidation($error_message);
         }
+        $data_update = $request->only(['name', 'email', 'password', 'phone']);
         $user = $request->user('api');
 
-        $data_update = $request->only(['name', 'email', 'password', 'phone']);
-        if (isset($data_update['password'])) {
-            $data_update['password'] = bcrypt($data_update['password']);
-        }
-        $user->update(
-            $data_update
-        );
+        $this->userRepository->update($data_update,$user->id);
+
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
     }
 
@@ -137,10 +124,9 @@ class UsersController extends ApiController
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation();
         }
-
         $user = $request->user('api');
-        $user->avatar = $request->input('avatar');
-        if (!$user->save()) {
+        $avatar = $request->input('avatar');
+        if (!$this->userRepository->update(['avatar'=>$avatar],$user->id)) {
             return $this->respondInternalError();
         }
 
@@ -156,24 +142,19 @@ class UsersController extends ApiController
     {
         try {
             $providerUser = Socialite::driver('facebook')->stateless()->user();
-        } catch (Exception $e) {
+        }
+        catch (Exception $e) {
             return $this->respondInternalError();
         }
-
-        $user = User::where('email', $providerUser->getEmail())->first();
-        if ($user) {
-            $user->provider_id = $providerUser->getId();
-            $user->save();
-
+        if ($user = $this->userRepository->getFirstWithAtribute('email',$providerUser->getEmail())) {
+            $this->userRepository->update(['provider_id'=>$providerUser->getId()],$user->id);
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+        }
+        if ($user = $this->userRepository->getFirstWithAtribute('provider_id', $providerUser->getId())) {
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         }
 
-        $user = User::where('provider_id', $providerUser->getId())->first();
-        if ($user) {
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
-        }
-
-        $user = User::create([
+        $user =$this->userRepository->create([
             'name' => $providerUser->getName(),
             'email' => $providerUser->getEmail(),
             'provider_id' => $providerUser->getId()
@@ -193,30 +174,20 @@ class UsersController extends ApiController
             $error_message = $validator->errors()->first();
             return $this->respondFailedParametersValidation($error_message);
         }
-
-        $_post_id = $request->input('post_id');
-        $_post = Post::where('id', $_post_id)->first();
-        if (!$_post) {
-            return $this->respondBadRequest('Post not exist');
-        }
-
         $user = $request->user('api');
+        $post_id = $request->input('post_id');
 
-        $user_like_post = User_Post_Like::where('post_id', $_post->id)->where('user_id',$user->id)->first();
-
-        if ($user_like_post){
-            $user_like_post->delete();
-            return $this->setStatusCode(Response::HTTP_OK)->respond([]);
+        try {
+            $_user_post_like = $this->userRepository->addUserLikePost($user->id, $post_id);
+        }
+        catch (Exception $e){
+            return $this->respondBadRequest($e->getMessage());
         }
 
-        $_user_post_like = User_Post_Like::create(
-            [
-                'user_id' => $user->id,
-                'post_id' => $_post->id
-            ]
-        );
-
-        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
+        if ($_user_post_like == null)
+            return $this->setStatusCode(Response::HTTP_OK)->respond([]);
+        else
+            return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $_user_post_like]);
     }
 
     private function setToken($user)

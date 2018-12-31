@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-interface PostRepositoryInterface extends PostRepositoryInterface
+interface PostRepositoryInterface extends RepositoryInterface
 {
-	
+	public function showPosts($page, array $data);
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Repositories\PostRepository as PostRepository;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,26 +29,10 @@ class PostsController  extends ApiController
     /**
      * @param PostTransformer $postTransformer
      */
-    function __construct(PostTransformer $postTransformer)
+    function __construct(PostTransformer $postTransformer, PostRepository $postRepository)
     {
         $this->postTransformer = $postTransformer;
-    }
-
-    public function index(Request $request)
-    {
-        $_page    = $request->input('page');
-
-
-        if (!is_null($_page) && !is_numeric($_page) ) {
-            return $this->respondFailedParametersValidation();
-        }
-
-        $_posts = Post::where('state_id','=',1)
-            ->groupBy('posts.id')
-            ->join('photos', 'photos.post_id', '=', 'posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
-
-        return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
+        $this->postRepository  = $postRepository;
     }
 
     public function showPosts(Request $request) {
@@ -56,25 +42,7 @@ class PostsController  extends ApiController
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
-        $data_filter    =$request->only('title', 'region_id', 'provincia_id','tag_id');
-        $_page          = $request->input('page');
-        $_name          = $request->input('title');
-        $_region_id     = $request->input('region_id');
-        $_provincia_id  = $request->input('provincia_id');
-        $_tag_id        =  $request->input('tag_id');
 
-        $_posts = Post::where('state_id','=',1)
-            ->where('title', 'like', '%' . $_name . '%')
-            ->whereRaw("(provincia_id = '{$_region_id}' or '{$_region_id}' = '' )")
-            ->whereRaw("(regiones.id = '{$_provincia_id}' or '{$_provincia_id}' = '' )")
-            ->whereRaw("(post_tags.tag_id = '{$_tag_id}' or '{$_tag_id}' = '' )")
-            ->groupBy('posts.id')
-            ->join('photos', 'photos.post_id', '=', 'posts.id')
-            ->join('provincias','posts.provincia_id','=','provincias.id')
-            ->join('regiones','provincias.region_id','=','regiones.id')
-            ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page)
-            ->appends( $data_filter );
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 

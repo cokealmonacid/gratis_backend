@@ -43,6 +43,8 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
 
+        $_posts = $this->postRepository->showPosts($request);
+
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 

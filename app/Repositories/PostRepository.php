@@ -44,14 +44,14 @@ class PostRepository implements PostRepositoryInterface
 		return $post;
 	}
 
-	public function showPosts($data)
+	public function showPosts(object $data)
 	{
-        $data_filter    = $request->only('title', 'region_id', 'provincia_id','tag_id');
-        $_page          = $request->input('page');
-        $_name          = $request->input('title');
-        $_region_id     = $request->input('region_id');
-        $_provincia_id  = $request->input('provincia_id');
-        $_tag_id        =  $request->input('tag_id');
+        $data_filter    = $data->only('title', 'region_id', 'provincia_id','tag_id');
+        $_page          = $data->input('page');
+        $_name          = $data->input('title');
+        $_region_id     = $data->input('region_id');
+        $_provincia_id  = $data->input('provincia_id');
+        $_tag_id        = $data->input('tag_id');
 
         $_posts = Post::where('state_id','=',1)
             ->where('title', 'like', '%' . $_name . '%')
@@ -65,5 +65,7 @@ class PostRepository implements PostRepositoryInterface
             ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
             ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page)
             ->appends( $data_filter );
+
+        return $_posts;
 	}
 }

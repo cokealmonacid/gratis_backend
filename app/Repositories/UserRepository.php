@@ -66,12 +66,11 @@ class UserRepository implements UserRepositoryInterface
 
     }
 
-    public function getFirstWithAtribute(String $atribute, $value){
-
+    public function findFirstWithAtribute(String $atribute, $value){
         return $user = $this->user_model->where($atribute, $value)->first();
     }
 
-    public function getWithMailRol (String $email, String $rol_description)
+    public function findWithMailRol(String $email, String $rol_description)
     {
 
         if(!$user = $this->user_model->where('email', $email)->first()){

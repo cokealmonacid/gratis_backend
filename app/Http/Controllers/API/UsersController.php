@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Repositories\UserRepository as UseRepo ;
+use App\Repositories\UserRepository as UseRepo;
 use Exception;
 
 use Illuminate\Http\Request;
@@ -15,9 +15,6 @@ use App\Models\User;
 
 use Auth;
 use Validator;
-use Illuminate\Support\Facades\DB;
-
-use Illuminate\Support\Str;
 use Socialite;
 
 
@@ -35,7 +32,7 @@ class UsersController extends ApiController
     /**
      * @param UserTransformer $userTransformer
      */
-    function __construct(UserTransformer $userTransformer,UseRepo $userRepository)
+    function __construct(UserTransformer $userTransformer, UseRepo $userRepository)
     {
         $this->userTransformer = $userTransformer;
         $this->userRepository = $userRepository;
@@ -43,14 +40,14 @@ class UsersController extends ApiController
 
     public function login(Request $request)
     {
-            $email = $request->input('email');
-            $password = $request->input('password');
-            if (!$email or !$password) {
-                return $this->respondFailedParametersValidation();
-            }
+        $email = $request->input('email');
+        $password = $request->input('password');
+        if (!$email or !$password) {
+            return $this->respondFailedParametersValidation();
+        }
         try {
             $user_rol = 'user';
-            $user = $this->userRepository->getWithMailRol($email, $user_rol);
+            $user = $this->userRepository->findWithMailRol($email, $user_rol);
             $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
 
             if ($attempt) {
@@ -59,10 +56,9 @@ class UsersController extends ApiController
             }
 
             return $this->respondBadRequest('The email and password dont match');
-            }
-        catch  (Exception $e) {
+        } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
-            }
+        }
     }
 
     public function logout(Request $request)
@@ -94,8 +90,7 @@ class UsersController extends ApiController
 
         try {
             $user = $this->userRepository->addUser(['email' => $_email, 'password' => bcrypt($_password)], 'user');
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
         }
 
@@ -113,7 +108,7 @@ class UsersController extends ApiController
         $data_update = $request->only(['name', 'email', 'password', 'phone']);
         $user = $request->user('api');
 
-        $this->userRepository->update($data_update,$user->id);
+        $this->userRepository->update($data_update, $user->id);
 
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transform($user)]);
     }
@@ -126,7 +121,7 @@ class UsersController extends ApiController
         }
         $user = $request->user('api');
         $avatar = $request->input('avatar');
-        if (!$this->userRepository->update(['avatar'=>$avatar],$user->id)) {
+        if (!$this->userRepository->update(['avatar' => $avatar], $user->id)) {
             return $this->respondInternalError();
         }
 
@@ -142,19 +137,18 @@ class UsersController extends ApiController
     {
         try {
             $providerUser = Socialite::driver('facebook')->stateless()->user();
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->respondInternalError();
         }
-        if ($user = $this->userRepository->getFirstWithAtribute('email',$providerUser->getEmail())) {
-            $this->userRepository->update(['provider_id'=>$providerUser->getId()],$user->id);
+        if ($user = $this->userRepository->findFirstWithAtribute('email', $providerUser->getEmail())) {
+            $this->userRepository->update(['provider_id' => $providerUser->getId()], $user->id);
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         }
-        if ($user = $this->userRepository->getFirstWithAtribute('provider_id', $providerUser->getId())) {
+        if ($user = $this->userRepository->findFirstWithAtribute('provider_id', $providerUser->getId())) {
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         }
 
-        $user =$this->userRepository->create([
+        $user = $this->userRepository->create([
             'name' => $providerUser->getName(),
             'email' => $providerUser->getEmail(),
             'provider_id' => $providerUser->getId()
@@ -179,8 +173,7 @@ class UsersController extends ApiController
 
         try {
             $_user_post_like = $this->userRepository->addUserLikePost($user->id, $post_id);
-        }
-        catch (Exception $e){
+        } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
         }
 

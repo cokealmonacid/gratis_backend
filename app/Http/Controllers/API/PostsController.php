@@ -3,24 +3,23 @@
 namespace App\Http\Controllers\API;
 
 use App\Repositories\PostRepository as PostRepository;
+use App\Repositories\PostTagsRepository as PostTagsRepository;
+use App\Repositories\PhotoRepository as PhotoRepository;
+use App\Repositories\ProvinciaRepository as ProvinciaRepository;
+use App\Repositories\TagRepository as TagRepository;
+use App\Repositories\UserPostLikeRepository as UserPostLikeRepository;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Transformers\PostTransformer;
-use App\Models\Photo;
 use App\Models\Post;
-use App\Models\User;
-use App\Models\User_Post_Like;
-use App\Models\Post_Tags;
-use App\Models\Provincia;
-use App\Models\Tag;
+use App\Models\Photo;
 use Validator;
 use Auth;
 
 class PostsController  extends ApiController
 {
-
     /**
      * @var PostTransformer
      */
@@ -29,21 +28,29 @@ class PostsController  extends ApiController
     /**
      * @param PostTransformer $postTransformer
      */
-    function __construct(PostTransformer $postTransformer, PostRepository $postRepository)
+    function __construct(PostTransformer $postTransformer, PostRepository $postRepository, 
+        ProvinciaRepository $provinciaRepository, PostTagsRepository $postTagsRepository,
+        PhotoRepository $photoRepository, UserPostLikeRepository $userPostLikeRepository,
+        TagRepository $tagRepository)
     {
-        $this->postTransformer = $postTransformer;
-        $this->postRepository  = $postRepository;
+        $this->postRepository         = $postRepository;
+        $this->postTagsRepository     = $postTagsRepository;
+        $this->postTransformer        = $postTransformer;
+        $this->provinciaRepository    = $provinciaRepository;
+        $this->photoRepository        = $photoRepository;
+        $this->userPostLikeRepository = $userPostLikeRepository;
+        $this->tagRepository          = $tagRepository;
     }
 
-    public function showPosts(Request $request) {
-
+    public function show(Request $request) 
+    {
         $validator = Validator::make($request->all(), Post::rulesFilter());
 
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
 
-        $_posts = $this->postRepository->showPosts($request);
+        $_posts = $this->postRepository->show($request);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
@@ -65,14 +72,13 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation('There is a problem with the images provided');
         }
 
-        $provincia_id = $request->input('provincia_id');
-        $provincia    = Provincia::whereId($provincia_id)->first();
+        $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
             return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
         }
 
         $user = Auth::guard('api')->user();
-        $post = Post::create([
+        $post = $this->postRepository->create([
             'title'        => $request->input('title'),
             'description'  => $request->input('description'),
             'provincia_id' => $provincia->id,
@@ -108,13 +114,12 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation('There is a problem with the images provided');
         }
 
-        $provincia_id = $request->input('provincia_id');
-        $provincia    = Provincia::whereId($provincia_id)->first();
+        $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
             return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
         }
 
-        $post = Post::whereId($id)->first();
+        $post = $this->postRepository->find($id);
         if (!$post) {
             return $this->respondBadRequest('This post does not exist');
         }
@@ -124,17 +129,18 @@ class PostsController  extends ApiController
             return $this->respondForbidden();
         }
 
-        $post->title        = $request->input('title');
-        $post->description  = $request->input('description');
-        $post->provincia_id = $provincia->id;
-        $post->save();
+        $this->postRepository->update($post->id, [
+            'title'        => $request->input('title'),
+            'description'  => $request->input('description'),
+            'provincia_id' => $provincia->id
+        ]);
 
-        $tags_delete = Post_Tags::where('post_id', $post->id)->delete();
+        $tags_delete = $this->postTagsRepository->delete($post->id);
         if ($tags_delete) {
             $this->post_tags($post->id, $tags);
         }
 
-        $photos_delete = Photo::where('post_id', $post->id)->delete();
+        $photos_delete = $this->photoRepository->delete($post->id);
         if ($photos_delete) {
             $this->post_photos($post->id, $photos);
         }
@@ -142,28 +148,14 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
-    public function show($id , Request $request) 
+    public function showDetail($id, Request $request) 
     {
-        if ($this->check_post_id($id)) {
+        $post = $this->postRepository->find($id);
+        if ($post) {
 
-            $post_detail = Post::whereId($id)
-                ->first()
-                ->join('users','users.id', '=' ,'posts.user_id')
-                ->select(
-                    'users.id as user_id'
-                    ,'users.name as user_name'
-                    ,'users.phone as user_phone'
-                    ,'users.avatar as user_avatar'
-                    ,'users.email as user_email'
-                    ,'posts.id as post_id'
-                    ,'posts.title as post_title'
-                    ,'posts.description as post_description'
+            $post_detail = $this->postRepository->showDetail($post->id);
 
-                )
-                ->first();
-
-
-            $post_photos = Photo::where('post_id' ,'=', $id)->get();
+            $post_photos = $this->photoRepository->select($post->id);
             if ( $request->user('api') ) {
                 return $this
                     ->setStatusCode(Response::HTTP_OK)
@@ -186,29 +178,24 @@ class PostsController  extends ApiController
     {
         $user = $request->user('api');
 
-        $user_likes = User_Post_Like::where('user_id', $user->id)->pluck('post_id');
+        $user_likes = $this->userPostLikeRepository->find($user->id);
         if (!$user_likes) {
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => null]);
         }
 
         $favourites = Collect();
         foreach ($user_likes as $like) {
-            $post = Post::whereId($like)->first();
+            $post = $this->postRepository->find($like);
             $favourites->push($this->postTransformer->transform($post));
         }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
 
-    private function check_post_id($post_id){
-        $post = Post::whereId($post_id)->first();
-        return !is_null($post);
-    }
-
     private function check_tags($tags)
     {
-        foreach($tags as $tag) {
-            $tag = Tag::whereId($tag)->first();
+        foreach($tags as $tag_id) {
+            $tag = $this->tagRepository->find($tag_id);
             if (!$tag){
                 return false;
             }
@@ -236,7 +223,7 @@ class PostsController  extends ApiController
     private function post_tags($post_id, $tags)
     {
         foreach($tags as $tag) {
-            Post_Tags::create([
+            $this->postTagsRepository->create([
                 'post_id' => $post_id,
                 'tag_id'  => $tag
             ]);
@@ -246,7 +233,7 @@ class PostsController  extends ApiController
     private function post_photos($post_id, $photos)
     {
         foreach($photos as $photo) {
-            Photo::create([
+            $this->photoRepository->create([
                 'post_id'   => $post_id,
                 'image'     => $photo['content'],
                 'thumbnail' => Photo::createThumbnail($photo['content']),

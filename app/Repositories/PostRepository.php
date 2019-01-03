@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Models\Post;
-use Exception;
 
 class PostRepository implements PostRepositoryInterface
 {
@@ -24,9 +23,9 @@ class PostRepository implements PostRepositoryInterface
 		return $this->post_model->create($data);
 	}
 
-	public function update(array $data, $id)
+	public function update($id, array $data)
 	{
-		return $this->post_model->where('id', $id)->update($data);
+		return $this->post_model->whereId($id)->update($data);
 	}
 
 	public function delete($id)
@@ -36,15 +35,10 @@ class PostRepository implements PostRepositoryInterface
 
 	public function find($id)
 	{
-		$post = $this->post_model->find($id);
-		if (!$post) {
-			throw new ModelNotFoundException("Post not found");
-		}
-
-		return $post;
+		return $this->post_model->find($id);
 	}
 
-	public function showPosts(object $data)
+	public function show(object $data)
 	{
         $data_filter    = $data->only('title', 'region_id', 'provincia_id','tag_id');
         $_page          = $data->input('page');
@@ -67,5 +61,24 @@ class PostRepository implements PostRepositoryInterface
             ->appends( $data_filter );
 
         return $_posts;
+	}
+
+	public function showDetail($id)
+	{
+		$post = Post::whereId($id)
+            ->first()
+            ->join('users','users.id', '=' ,'posts.user_id')
+            ->select(
+                'users.id as user_id'
+                ,'users.name as user_name'
+                ,'users.phone as user_phone'
+                ,'users.avatar as user_avatar'
+                ,'users.email as user_email'
+                ,'posts.id as post_id'
+                ,'posts.title as post_title'
+                ,'posts.description as post_description'
+            )->first();
+
+        return $post;
 	}
 }

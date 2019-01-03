@@ -11,11 +11,11 @@ namespace App\Repositories;
 
 interface UserRepositoryInterface extends RepositoryInterface
 {
-    public function getWithMailRol (String $email, String $rol);
+    public function findWithMailRol (String $email, String $rol);
 
     public function addUser(array $user_data,  String $rol);
 
-    public function getFirstWithAtribute(String $atribute, $value);
+    public function findFirstWithAtribute(String $atribute, $value);
 
     public function addUserLikePost($user_id, $post_id);
 }

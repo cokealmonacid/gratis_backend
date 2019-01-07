@@ -23,7 +23,7 @@ class UserPostLikeRepository implements RepositoryInterface
 		return $this->user_post_like_model->create($data);
 	}
 
-	public function update($id, array $data)
+	public function update(array $data, $id)
 	{
 		return $this->user_post_like_model->whereId($id)->update($data);
 	}

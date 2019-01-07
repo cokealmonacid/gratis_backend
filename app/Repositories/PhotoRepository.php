@@ -23,7 +23,7 @@ class PhotoRepository implements PhotoRepositoryInterface
 		return $this->photo_model->create($data);
 	}
 
-	public function update($id, array $data)
+	public function update(array $data, $id)
 	{
 		return $this->photo_model->whereId($id)->update($data);
 	}

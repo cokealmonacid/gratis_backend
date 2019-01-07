@@ -3,14 +3,20 @@
 namespace App\Repositories;
 
 use App\Models\Post;
+use App\Models\Post_Tags;
+use App\Models\Photo;
 
 class PostRepository implements PostRepositoryInterface
 {
 	protected $post_model;
+	protected $post_tags_model;
+	protected $photo_model;
 
-	public function __construct(Post $post)
+	public function __construct(Post $post, Post_Tags $post_tags_model, Photo $photo_model)
 	{
-		$this->post_model = $post;
+		$this->post_model      = $post;
+		$this->post_tags_model = $post_tags_model;
+		$this->photo_model     = $photo_model;
 	}
 
 	public function all()
@@ -23,9 +29,35 @@ class PostRepository implements PostRepositoryInterface
 		return $this->post_model->create($data);
 	}
 
-	public function update($id, array $data)
+	public function createWithPostAndTags($photos, $tags, array $data)
+	{
+		$post = $this->post_model->create($data);
+
+		$this->post_tags($post['id'], $tags);
+
+		$this->post_photos($post['id'], $photos);
+
+		return $post;
+	}
+
+	public function update(array $data, $id)
 	{
 		return $this->post_model->whereId($id)->update($data);
+	}
+
+	public function updateWithPostAndTags($id, $photos, $tags, array $data)
+	{
+		$post = $this->post_model->whereId($id)->update($data);
+
+		$this->post_tags_model->where('post_id', $id)->delete();
+
+		$this->photo_model->where('post_id', $id)->delete();
+
+		$this->post_tags($id, $tags);
+
+		$this->post_photos($id, $photos);
+
+		return $post;
 	}
 
 	public function delete($id)
@@ -81,4 +113,26 @@ class PostRepository implements PostRepositoryInterface
 
         return $post;
 	}
+
+    private function post_tags($post_id, $tags)
+    {
+        foreach($tags as $tag) {
+            $this->post_tags_model->create([
+                'post_id' => $post_id,
+                'tag_id'  => $tag
+            ]);
+        }
+    }
+
+    private function post_photos($post_id, $photos)
+    {
+        foreach($photos as $photo) {
+            $this->photo_model->create([
+                'post_id'   => $post_id,
+                'image'     => $photo['content'],
+                'thumbnail' => $this->photo_model->createThumbnail($photo['content']),
+                'principal' => $photo['principal']
+            ]);
+        }   
+    }
 }

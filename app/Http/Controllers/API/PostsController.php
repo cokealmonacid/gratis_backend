@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Repositories\PostRepository as PostRepository;
-use App\Repositories\PostTagsRepository as PostTagsRepository;
 use App\Repositories\PhotoRepository as PhotoRepository;
 use App\Repositories\ProvinciaRepository as ProvinciaRepository;
 use App\Repositories\TagRepository as TagRepository;
@@ -29,15 +28,13 @@ class PostsController  extends ApiController
      * @param PostTransformer $postTransformer
      */
     function __construct(PostTransformer $postTransformer, PostRepository $postRepository, 
-        ProvinciaRepository $provinciaRepository, PostTagsRepository $postTagsRepository,
-        PhotoRepository $photoRepository, UserPostLikeRepository $userPostLikeRepository,
-        TagRepository $tagRepository)
+        ProvinciaRepository $provinciaRepository, UserPostLikeRepository $userPostLikeRepository,
+        TagRepository $tagRepository, PhotoRepository $photoRepository)
     {
+        $this->photoRepository        = $photoRepository;
         $this->postRepository         = $postRepository;
-        $this->postTagsRepository     = $postTagsRepository;
         $this->postTransformer        = $postTransformer;
         $this->provinciaRepository    = $provinciaRepository;
-        $this->photoRepository        = $photoRepository;
         $this->userPostLikeRepository = $userPostLikeRepository;
         $this->tagRepository          = $tagRepository;
     }
@@ -78,7 +75,7 @@ class PostsController  extends ApiController
         }
 
         $user = Auth::guard('api')->user();
-        $post = $this->postRepository->create([
+        $post = $this->postRepository->createWithPostAndTags($photos, $tags, [
             'title'        => $request->input('title'),
             'description'  => $request->input('description'),
             'provincia_id' => $provincia->id,
@@ -89,10 +86,6 @@ class PostsController  extends ApiController
         if (!$post) {
             return $this->respondFailedParametersValidation('Error while internally saving an post');
         }
-
-        $this->post_tags($post->id, $tags);
-
-        $this->post_photos($post->id, $photos);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
@@ -129,21 +122,11 @@ class PostsController  extends ApiController
             return $this->respondForbidden();
         }
 
-        $this->postRepository->update($post->id, [
+        $this->postRepository->updateWithPostAndTags($post->id, $photos, $tags, [
             'title'        => $request->input('title'),
             'description'  => $request->input('description'),
             'provincia_id' => $provincia->id
         ]);
-
-        $tags_delete = $this->postTagsRepository->delete($post->id);
-        if ($tags_delete) {
-            $this->post_tags($post->id, $tags);
-        }
-
-        $photos_delete = $this->photoRepository->delete($post->id);
-        if ($photos_delete) {
-            $this->post_photos($post->id, $photos);
-        }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
@@ -218,27 +201,5 @@ class PostsController  extends ApiController
         }
 
         return $photos;
-    }
-
-    private function post_tags($post_id, $tags)
-    {
-        foreach($tags as $tag) {
-            $this->postTagsRepository->create([
-                'post_id' => $post_id,
-                'tag_id'  => $tag
-            ]);
-        }
-    }
-
-    private function post_photos($post_id, $photos)
-    {
-        foreach($photos as $photo) {
-            $this->photoRepository->create([
-                'post_id'   => $post_id,
-                'image'     => $photo['content'],
-                'thumbnail' => Photo::createThumbnail($photo['content']),
-                'principal' => $photo['principal']
-            ]);
-        }   
     }
 }

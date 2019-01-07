@@ -23,7 +23,7 @@ class ProvinciaRepository implements RepositoryInterface
 		return $this->provincia_model->create($data);
 	}
 
-	public function update($id, array $data)
+	public function update(array $data, $id)
 	{
 		return $this->provincia_model->whereId($id)->update($data);
 	}

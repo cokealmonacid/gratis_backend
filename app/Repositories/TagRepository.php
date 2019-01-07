@@ -23,7 +23,7 @@ class TagRepository implements RepositoryInterface
 		return $this->tag_model->create($data);
 	}
 
-	public function update($id, array $data)
+	public function update(array $data, $id)
 	{
 		return $this->tag_model->whereId($id)->update($data);
 	}

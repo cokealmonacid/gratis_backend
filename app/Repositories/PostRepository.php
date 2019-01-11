@@ -70,14 +70,13 @@ class PostRepository implements PostRepositoryInterface
 		return $this->post_model->find($id);
 	}
 
-	public function show(object $data)
+	public function show(array $data_filter, array $data_search)
 	{
-        $data_filter    = $data->only('title', 'region_id', 'provincia_id','tag_id');
-        $_page          = $data->input('page');
-        $_name          = $data->input('title');
-        $_region_id     = $data->input('region_id');
-        $_provincia_id  = $data->input('provincia_id');
-        $_tag_id        = $data->input('tag_id');
+        $_page          = $data_search["page"];
+        $_name          = $data_search["name"];
+        $_region_id     = $data_search["region_id"];
+        $_provincia_id  = $data_search["provincia_id"];
+        $_tag_id        = $data_search["tag_id"];
 
         $_posts = Post::where('state_id','=',1)
             ->where('title', 'like', '%' . $_name . '%')

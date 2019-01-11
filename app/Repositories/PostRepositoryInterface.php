@@ -6,7 +6,7 @@ interface PostRepositoryInterface extends RepositoryInterface
 {
 	public function createWithPostAndTags($photos, $tags, array $data);
 
-	public function show(object $data);
+	public function show(array $data_filter, array $data_search);
 
 	public function showDetail($id);
 

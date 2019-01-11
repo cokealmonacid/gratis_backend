@@ -47,7 +47,17 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
 
-        $_posts = $this->postRepository->show($request);
+        $data_filter    = $request->only('title', 'region_id', 'provincia_id','tag_id');
+
+        $data_search = [
+            "page"         => $request->input('page'),
+            "name"         => $request->input('title'),
+            "region_id"    => $request->input('region_id'),
+            "provincia_id" => $request->input('provincia_id'),
+            "tag_id"       => $request->input('tag_id')
+        ];
+
+        $_posts = $this->postRepository->show($data_filter, $data_search);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }

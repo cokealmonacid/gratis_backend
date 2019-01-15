@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Repositories\PostRepository as PostRepository;
+use App\Repositories\PhotoRepository as PhotoRepository;
+use App\Repositories\ProvinciaRepository as ProvinciaRepository;
+use App\Repositories\TagRepository as TagRepository;
+use App\Repositories\UserPostLikeRepository as UserPostLikeRepository;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Transformers\PostTransformer;
-use App\Models\Photo;
 use App\Models\Post;
-use App\Models\User;
-use App\Models\User_Post_Like;
-use App\Models\Post_Tags;
-use App\Models\Provincia;
-use App\Models\Tag;
+use App\Models\Photo;
 use Validator;
 use Auth;
 
 class PostsController  extends ApiController
 {
-
     /**
      * @var PostTransformer
      */
@@ -27,54 +27,38 @@ class PostsController  extends ApiController
     /**
      * @param PostTransformer $postTransformer
      */
-    function __construct(PostTransformer $postTransformer)
+    function __construct(PostTransformer $postTransformer, PostRepository $postRepository, 
+        ProvinciaRepository $provinciaRepository, UserPostLikeRepository $userPostLikeRepository,
+        TagRepository $tagRepository, PhotoRepository $photoRepository)
     {
-        $this->postTransformer = $postTransformer;
+        $this->photoRepository        = $photoRepository;
+        $this->postRepository         = $postRepository;
+        $this->postTransformer        = $postTransformer;
+        $this->provinciaRepository    = $provinciaRepository;
+        $this->userPostLikeRepository = $userPostLikeRepository;
+        $this->tagRepository          = $tagRepository;
     }
 
-    public function index(Request $request)
+    public function show(Request $request) 
     {
-        $_page    = $request->input('page');
-
-
-        if (!is_null($_page) && !is_numeric($_page) ) {
-            return $this->respondFailedParametersValidation();
-        }
-
-        $_posts = Post::where('state_id','=',1)
-            ->groupBy('posts.id')
-            ->join('photos', 'photos.post_id', '=', 'posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page);
-
-        return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
-    }
-
-    public function showPosts(Request $request) {
-
         $validator = Validator::make($request->all(), Post::rulesFilter());
 
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
-        $data_filter    =$request->only('title', 'region_id', 'provincia_id','tag_id');
-        $_page          = $request->input('page');
-        $_name          = $request->input('title');
-        $_region_id     = $request->input('region_id');
-        $_provincia_id  = $request->input('provincia_id');
-        $_tag_id        =  $request->input('tag_id');
 
-        $_posts = Post::where('state_id','=',1)
-            ->where('title', 'like', '%' . $_name . '%')
-            ->whereRaw("(provincia_id = '{$_region_id}' or '{$_region_id}' = '' )")
-            ->whereRaw("(regiones.id = '{$_provincia_id}' or '{$_provincia_id}' = '' )")
-            ->whereRaw("(post_tags.tag_id = '{$_tag_id}' or '{$_tag_id}' = '' )")
-            ->groupBy('posts.id')
-            ->join('photos', 'photos.post_id', '=', 'posts.id')
-            ->join('provincias','posts.provincia_id','=','provincias.id')
-            ->join('regiones','provincias.region_id','=','regiones.id')
-            ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page)
-            ->appends( $data_filter );
+        $data_filter    = $request->only('title', 'region_id', 'provincia_id','tag_id');
+
+        $data_search = [
+            "page"         => $request->input('page'),
+            "name"         => $request->input('title'),
+            "region_id"    => $request->input('region_id'),
+            "provincia_id" => $request->input('provincia_id'),
+            "tag_id"       => $request->input('tag_id')
+        ];
+
+        $_posts = $this->postRepository->show($data_filter, $data_search);
+
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
     }
 
@@ -95,14 +79,13 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation('There is a problem with the images provided');
         }
 
-        $provincia_id = $request->input('provincia_id');
-        $provincia    = Provincia::whereId($provincia_id)->first();
+        $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
             return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
         }
 
         $user = Auth::guard('api')->user();
-        $post = Post::create([
+        $post = $this->postRepository->createWithPostAndTags($photos, $tags, [
             'title'        => $request->input('title'),
             'description'  => $request->input('description'),
             'provincia_id' => $provincia->id,
@@ -113,10 +96,6 @@ class PostsController  extends ApiController
         if (!$post) {
             return $this->respondFailedParametersValidation('Error while internally saving an post');
         }
-
-        $this->post_tags($post->id, $tags);
-
-        $this->post_photos($post->id, $photos);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
@@ -138,13 +117,12 @@ class PostsController  extends ApiController
             return $this->respondFailedParametersValidation('There is a problem with the images provided');
         }
 
-        $provincia_id = $request->input('provincia_id');
-        $provincia    = Provincia::whereId($provincia_id)->first();
+        $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
             return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
         }
 
-        $post = Post::whereId($id)->first();
+        $post = $this->postRepository->find($id);
         if (!$post) {
             return $this->respondBadRequest('This post does not exist');
         }
@@ -154,46 +132,23 @@ class PostsController  extends ApiController
             return $this->respondForbidden();
         }
 
-        $post->title        = $request->input('title');
-        $post->description  = $request->input('description');
-        $post->provincia_id = $provincia->id;
-        $post->save();
-
-        $tags_delete = Post_Tags::where('post_id', $post->id)->delete();
-        if ($tags_delete) {
-            $this->post_tags($post->id, $tags);
-        }
-
-        $photos_delete = Photo::where('post_id', $post->id)->delete();
-        if ($photos_delete) {
-            $this->post_photos($post->id, $photos);
-        }
+        $this->postRepository->updateWithPostAndTags($post->id, $photos, $tags, [
+            'title'        => $request->input('title'),
+            'description'  => $request->input('description'),
+            'provincia_id' => $provincia->id
+        ]);
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
-    public function show($id , Request $request) 
+    public function showDetail($id, Request $request) 
     {
-        if ($this->check_post_id($id)) {
+        $post = $this->postRepository->find($id);
+        if ($post) {
 
-            $post_detail = Post::whereId($id)
-                ->first()
-                ->join('users','users.id', '=' ,'posts.user_id')
-                ->select(
-                    'users.id as user_id'
-                    ,'users.name as user_name'
-                    ,'users.phone as user_phone'
-                    ,'users.avatar as user_avatar'
-                    ,'users.email as user_email'
-                    ,'posts.id as post_id'
-                    ,'posts.title as post_title'
-                    ,'posts.description as post_description'
+            $post_detail = $this->postRepository->showDetail($post->id);
 
-                )
-                ->first();
-
-
-            $post_photos = Photo::where('post_id' ,'=', $id)->get();
+            $post_photos = $this->photoRepository->select($post->id);
             if ( $request->user('api') ) {
                 return $this
                     ->setStatusCode(Response::HTTP_OK)
@@ -216,29 +171,24 @@ class PostsController  extends ApiController
     {
         $user = $request->user('api');
 
-        $user_likes = User_Post_Like::where('user_id', $user->id)->pluck('post_id');
+        $user_likes = $this->userPostLikeRepository->find($user->id);
         if (!$user_likes) {
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => null]);
         }
 
         $favourites = Collect();
         foreach ($user_likes as $like) {
-            $post = Post::whereId($like)->first();
+            $post = $this->postRepository->find($like);
             $favourites->push($this->postTransformer->transform($post));
         }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
 
-    private function check_post_id($post_id){
-        $post = Post::whereId($post_id)->first();
-        return !is_null($post);
-    }
-
     private function check_tags($tags)
     {
-        foreach($tags as $tag) {
-            $tag = Tag::whereId($tag)->first();
+        foreach($tags as $tag_id) {
+            $tag = $this->tagRepository->find($tag_id);
             if (!$tag){
                 return false;
             }
@@ -261,27 +211,5 @@ class PostsController  extends ApiController
         }
 
         return $photos;
-    }
-
-    private function post_tags($post_id, $tags)
-    {
-        foreach($tags as $tag) {
-            Post_Tags::create([
-                'post_id' => $post_id,
-                'tag_id'  => $tag
-            ]);
-        }
-    }
-
-    private function post_photos($post_id, $photos)
-    {
-        foreach($photos as $photo) {
-            Photo::create([
-                'post_id'   => $post_id,
-                'image'     => $photo['content'],
-                'thumbnail' => Photo::createThumbnail($photo['content']),
-                'principal' => $photo['principal']
-            ]);
-        }   
     }
 }

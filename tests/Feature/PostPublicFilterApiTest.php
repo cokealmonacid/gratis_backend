@@ -106,15 +106,14 @@ class PostPublicFilterApiTestApiTest extends TestCase
     /** @test */
     public function it_get_posts_whit_void_params()
     {
-
-
         $response = $this->getJson("api/v1/posts/public",[]);
         $response->assertStatus(200);
     }
 
 
     /** @test */
-    public function it_get_public_posts_all_params() {
+    public function it_get_public_posts_all_params()
+    {
         $_page = 1;
 
         $post_tag = Post_Tags::inRandomOrder()->first();

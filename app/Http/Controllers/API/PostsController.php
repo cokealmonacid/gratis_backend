@@ -24,6 +24,7 @@ class PostsController  extends ApiController
      */
     protected $postTransformer;
 
+
     /**
      * @param PostTransformer $postTransformer
      */
@@ -31,12 +32,12 @@ class PostsController  extends ApiController
         ProvinciaRepository $provinciaRepository, UserPostLikeRepository $userPostLikeRepository,
         TagRepository $tagRepository, PhotoRepository $photoRepository)
     {
-        $this->photoRepository        = $photoRepository;
-        $this->postRepository         = $postRepository;
-        $this->postTransformer        = $postTransformer;
-        $this->provinciaRepository    = $provinciaRepository;
+        $this->photoRepository = $photoRepository;
+        $this->postRepository = $postRepository;
+        $this->postTransformer = $postTransformer;
+        $this->provinciaRepository = $provinciaRepository;
         $this->userPostLikeRepository = $userPostLikeRepository;
-        $this->tagRepository          = $tagRepository;
+        $this->tagRepository = $tagRepository;
     }
 
     public function show(Request $request) 
@@ -165,6 +166,14 @@ class PostsController  extends ApiController
         } else {
             return $this->respondBadRequest('Post not found');
         }
+    }
+
+    public function showUserPosts ($post_id,$user_id)
+    {
+        $_posts = $this->postRepository->showUserPosts($post_id, $user_id);
+        return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
+
+
     }
 
     public function favourites(Request $request)

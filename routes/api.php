@@ -20,9 +20,13 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
     Route::get('/users/login/facebook', 'UsersController@handleProviderCallback');
     Route::post('/users', 'UsersController@create');
 
+
 	/** Posts **/
+
     Route::get('/posts/public', 'PostsController@show');
     Route::get('/posts/{id}', 'PostsController@showDetail');
+    Route::get('/posts/user/{post_id}/{user_id}', 'PostsController@showUserPosts');
+
 });
 
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {

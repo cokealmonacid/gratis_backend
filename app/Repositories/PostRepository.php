@@ -94,6 +94,22 @@ class PostRepository implements PostRepositoryInterface
         return $_posts;
 	}
 
+	function showUserPosts (String $id, int $user_id) {
+
+        $_posts = Post::where('state_id','=',1)
+            ->where('user_id', '=', $user_id)
+            ->where('posts.id', '!=', $id)
+            ->groupBy('posts.id')
+            ->join('photos', 'photos.post_id', '=', 'posts.id')
+            ->join('provincias','posts.provincia_id','=','provincias.id')
+            ->join('regiones','provincias.region_id','=','regiones.id')
+            ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
+            ->limit(5)
+            ->get(['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail']);
+
+        return $_posts;
+    }
+
 	public function showDetail($id)
 	{
 		$post = Post::whereId($id)

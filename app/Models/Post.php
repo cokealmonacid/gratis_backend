@@ -28,8 +28,6 @@ class Post extends Model
         'publish_date'
     ];
 
-
-
     public static function rules(){
         return [
             'title'         => 'required|max:255',
@@ -39,6 +37,7 @@ class Post extends Model
             'photos'        => 'required|array'
         ];
     }
+    
     public static function rulesFilter(){
         return [
             'title'         => 'nullable|max:255',

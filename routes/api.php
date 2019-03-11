@@ -25,7 +25,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 
     Route::get('/posts/public', 'PostsController@show');
     Route::get('/posts/{id}', 'PostsController@showDetail');
-    Route::get('/posts/user/{post_id}/{user_id}', 'PostsController@showUserPosts');
+    Route::get('/posts/user/{user_id}', 'PostsController@showUserPosts');
 
 });
 

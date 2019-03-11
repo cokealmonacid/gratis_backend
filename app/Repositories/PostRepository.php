@@ -94,11 +94,10 @@ class PostRepository implements PostRepositoryInterface
         return $_posts;
 	}
 
-	function showUserPosts (String $id, int $user_id) {
+	function showUserPosts (int $user_id) {
 
         $_posts = Post::where('state_id','=',1)
             ->where('user_id', '=', $user_id)
-            ->where('posts.id', '!=', $id)
             ->groupBy('posts.id')
             ->join('photos', 'photos.post_id', '=', 'posts.id')
             ->join('provincias','posts.provincia_id','=','provincias.id')

@@ -46,5 +46,6 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
 
     /** Reasons */
     Route::get('/reasons', 'ReportReasonsController@index');
+    Route::post('/reasons', 'ReportReasonsController@store');
 });
 

@@ -16,4 +16,11 @@ class Report_Reason extends Model
     protected $fillable = [
         'description'
     ];
+
+    public static function rules(){
+        return [
+            'post_id'         => 'required',
+            'report_id'       => 'required',
+        ];
+    }
 }

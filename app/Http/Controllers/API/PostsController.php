@@ -168,9 +168,9 @@ class PostsController  extends ApiController
         }
     }
 
-    public function showUserPosts ($post_id,$user_id)
+    public function showUserPosts ($user_id)
     {
-        $_posts = $this->postRepository->showUserPosts($post_id, $user_id);
+        $_posts = $this->postRepository->showUserPosts($user_id);
         return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
 
 

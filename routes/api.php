@@ -43,5 +43,9 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');
+
+    /** Reasons */
+    Route::get('/reasons', 'ReportReasonsController@index');
+    Route::post('/reasons', 'ReportReasonsController@store');
 });
 

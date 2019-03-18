@@ -142,6 +142,32 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
     }
 
+    public function updateState($id,Request $request){
+        $state_id = $request->input('state_id');
+        if (!$state_id) {
+            return $this->respondFailedParametersValidation('The state_id is requered.');
+        }
+        $post = $this->postRepository->find($id);
+        if (!$post) {
+            return $this->respondBadRequest('This post does not exist');
+        }
+        $user = Auth::guard('api')->user();
+        if ($post->user_id != $user->id) {
+            return $this->respondForbidden();
+        }
+
+        $post = $this->postRepository->update(array(
+            'state_id'=>$state_id
+        ), $id);
+
+        if (!$post) {
+            return $this->respondFailedParametersValidation('Error while internally saving an post');
+        }
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
+
+    }
+
     public function showDetail($id, Request $request) 
     {
         $post = $this->postRepository->find($id);

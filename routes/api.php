@@ -39,7 +39,7 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
     /** Posts **/
     Route::post('/posts', 'PostsController@store');
     Route::put('/posts/{id}', 'PostsController@update');
-    Route::put('/posts/{id}', 'PostsController@updateState');
+    Route::put('/posts/state/{id}', 'PostsController@updateState');
     Route::get('/favourites', 'PostsController@favourites');
 
     /** User Post */

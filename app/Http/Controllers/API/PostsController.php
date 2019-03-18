@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Repositories\PostRepository as PostRepository;
 use App\Repositories\PhotoRepository as PhotoRepository;
+use App\Repositories\StateRespository as StateRepository;
 use App\Repositories\ProvinciaRepository as ProvinciaRepository;
 use App\Repositories\TagRepository as TagRepository;
 use App\Repositories\UserPostLikeRepository as UserPostLikeRepository;
@@ -30,7 +31,7 @@ class PostsController  extends ApiController
      */
     function __construct(PostTransformer $postTransformer, PostRepository $postRepository, 
         ProvinciaRepository $provinciaRepository, UserPostLikeRepository $userPostLikeRepository,
-        TagRepository $tagRepository, PhotoRepository $photoRepository)
+        TagRepository $tagRepository, PhotoRepository $photoRepository,StateRepository $stateRespository)
     {
         $this->photoRepository = $photoRepository;
         $this->postRepository = $postRepository;
@@ -38,6 +39,7 @@ class PostsController  extends ApiController
         $this->provinciaRepository = $provinciaRepository;
         $this->userPostLikeRepository = $userPostLikeRepository;
         $this->tagRepository = $tagRepository;
+        $this->stateRespository = $stateRespository;
     }
 
     public function show(Request $request) 
@@ -147,6 +149,9 @@ class PostsController  extends ApiController
         if (!$state_id) {
             return $this->respondFailedParametersValidation('The state_id is requered.');
         }
+        if (!$this->check_state_id($state_id)){
+            return $this->respondFailedParametersValidation('The state_id is not valid.');
+        }
         $post = $this->postRepository->find($id);
         if (!$post) {
             return $this->respondBadRequest('This post does not exist');
@@ -230,6 +235,11 @@ class PostsController  extends ApiController
         }
 
         return $tags;
+    }
+
+    private function check_state_id($state_id){
+        $state = $this->stateRespository->find($state_id);
+        return $state;
     }
 
     private function check_photos($photos)

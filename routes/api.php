@@ -22,10 +22,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 
 
 	/** Posts **/
-
     Route::get('/posts/public', 'PostsController@show');
     Route::get('/posts/{id}', 'PostsController@showDetail');
     Route::get('/posts/user/{user_id}', 'PostsController@showUserPosts');
+
+    /** Password Reset **/
+    Route::post('/create', 'PasswordResetController@create');
+    Route::get('/find/{token}', 'PasswordResetController@find');
+    Route::post('/reset', 'PasswordResetController@reset');
 
 });
 

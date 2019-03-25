@@ -10,9 +10,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
 use App\Notifications\PasswordResetRequest;
 use App\Notifications\PasswordResetSuccess;
+use Symfony\Component\HttpFoundation\Response;
 use App\Models\PasswordReset;
 use App\Models\User;
 use Carbon\Carbon;
+use Validator;
 
 class PasswordResetController extends ApiController
 {
@@ -43,28 +45,29 @@ class PasswordResetController extends ApiController
         	return $this->respondFailedParametersValidation('The email provided doesnt exist');
         }
 
-        $passwordReset = $this->PasswordResetRepository->findFirstWithAtribute('email', $request->email);
+        $token = str_random(60);
+        $passwordReset = $this->passwordResetRepository->findFirstWithAttribute('email', $request->email);
         if ($passwordReset) {
-        	$passwordReset = $this->passwordResetRepository->update(['token' => str_random(60)], $passwordReset->id);
+        	$passwordReset = $this->passwordResetRepository->update(['token' => $token], $passwordReset->id);
         } else {
         	$passwordReset = $this->passwordResetRepository->create([
         		'email' => $request->email,
-        		'token' => str_random(60)
+        		'token' => $token
         	]);
         }
 
         try {
-        	$user->notify(new PasswordResetRequest($passwordReset->token));
+        	$user->notify(new PasswordResetRequest($token));
         	return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "We have e-mailed your password reset link!"]);
 
         } catch (Exception $e) {
-        	return $this->respondBadRequest($e->getMessage());
+        	return $this->respondBadRequest();
         }
     }
 
     public function find($token)
     {
-    	$passwordReset = $this->PasswordResetRepository->findFirstWithAttribute('token', $token);
+    	$passwordReset = $this->passwordResetRepository->findFirstWithAttribute('token', $token);
         if (!$passwordReset) {
         	return $this->respondFailedParametersValidation('This password reset token is invalid.');
         }
@@ -85,7 +88,7 @@ class PasswordResetController extends ApiController
             return $this->respondFailedParametersValidation($error_message);
         }
 
-        $passwordReset = $this->PasswordResetRepository->findWithAttributes([
+        $passwordReset = $this->passwordResetRepository->findWithAttributes([
             'token'  => $request->token,
             'email' => $request->email
         ]);
@@ -106,7 +109,7 @@ class PasswordResetController extends ApiController
         	return $this->setStatusCode(Response::HTTP_SUCCESS)->respond(['data' => $this->userTransformer->transform($user)]);
 
         } catch (Exception $e) {
-        	return $this->respondBadRequest($e->getMessage());
+        	return $this->respondBadRequest();
         }
     }
 }

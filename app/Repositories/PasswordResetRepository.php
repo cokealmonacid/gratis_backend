@@ -40,7 +40,7 @@ class PasswordResetRepository implements PasswordResetRepositoryInterface
 
 	public function findFirstWithAttribute(String $atribute, $value)
 	{
-        return $this->pass_reset_model->where($atribute, $value)->first();
+        return $this->pass_reset_model->where($atribute, $value)->get()->first();
 	}
 
 	public function findWithAttributes(array $data)

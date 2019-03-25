@@ -27,9 +27,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
     Route::get('/posts/user/{user_id}', 'PostsController@showUserPosts');
 
     /** Password Reset **/
-    Route::post('/create', 'PasswordResetController@create');
-    Route::get('/find/{token}', 'PasswordResetController@find');
-    Route::post('/reset', 'PasswordResetController@reset');
+    Route::post('/password/create', 'PasswordResetController@create');
+    Route::get('/password/find/{token}', 'PasswordResetController@find');
+    Route::post('/password/reset', 'PasswordResetController@reset');
 
 });
 

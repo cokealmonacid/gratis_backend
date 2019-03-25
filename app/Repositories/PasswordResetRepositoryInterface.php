@@ -5,5 +5,7 @@ namespace App\Repositories;
 
 interface PasswordResetRepositoryInterface extends RepositoryInterface
 {
-    public function findFirstWithAtribute(String $atribute, $value);
+    public function findFirstWithAttribute(String $atribute, $value);
+
+    public function findWithAttributes(array $data);
 }

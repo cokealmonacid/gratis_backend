@@ -88,6 +88,11 @@ class PasswordResetController extends ApiController
             return $this->respondFailedParametersValidation($error_message);
         }
 
+        $user = $this->userRepository->findFirstWithAtribute('email', $request->email);
+        if (!$user) {
+            return $this->respondFailedParametersValidation('The email provided doesnt exist');
+        }
+
         $passwordReset = $this->passwordResetRepository->findWithAttributes([
             'token'  => $request->token,
             'email' => $request->email
@@ -97,16 +102,11 @@ class PasswordResetController extends ApiController
         	return $this->respondFailedParametersValidation('This password reset token is invalid.');
         }
 
-        $user = $this->userRepository->findFirstWithAtribute('email', $passwordReset->email);
-        if (!$user) {
-        	return $this->respondFailedParametersValidation('The email provided doesnt exist');
-        }
-
         try {
         	$this->userRepository->update(['password' => $request->password], $user->id);
 
         	$user->notify(new PasswordResetSuccess($passwordReset));
-        	return $this->setStatusCode(Response::HTTP_SUCCESS)->respond(['data' => $this->userTransformer->transform($user)]);
+        	return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transform($user)]);
 
         } catch (Exception $e) {
         	return $this->respondBadRequest();

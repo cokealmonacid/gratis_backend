@@ -42,7 +42,7 @@ class PasswordResetController extends ApiController
 
         $user = $this->userRepository->findFirstWithAtribute('email', $request->email);
         if (!$user) {
-        	return $this->respondFailedParametersValidation('The email provided doesnt exist');
+        	return $this->respondFailedParametersValidation(trans('passwords.user'));
         }
 
         $token = str_random(60);
@@ -58,7 +58,7 @@ class PasswordResetController extends ApiController
 
         try {
         	$user->notify(new PasswordResetRequest($token));
-        	return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "We have e-mailed your password reset link!"]);
+        	return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => trans('passwords.sent')]);
 
         } catch (Exception $e) {
         	return $this->respondBadRequest();
@@ -69,12 +69,12 @@ class PasswordResetController extends ApiController
     {
     	$passwordReset = $this->passwordResetRepository->findFirstWithAttribute('token', $token);
         if (!$passwordReset) {
-        	return $this->respondFailedParametersValidation('This password reset token is invalid.');
+        	return $this->respondFailedParametersValidation(trans('passwords.token'));
         }
 
         if (Carbon::parse($passwordReset->updated_at)->addMinutes(720)->isPast()) {
             $this->PasswordResetRepository->delete($passwordReset->id);
-            return $this->respondFailedParametersValidation('This password reset token is invalid.');
+            return $this->respondFailedParametersValidation(trans('passwords.token'));
         }
 
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $passwordReset]);
@@ -90,7 +90,7 @@ class PasswordResetController extends ApiController
 
         $user = $this->userRepository->findFirstWithAtribute('email', $request->email);
         if (!$user) {
-            return $this->respondFailedParametersValidation('The email provided doesnt exist');
+            return $this->respondFailedParametersValidation(trans('passwords.user'));
         }
 
         $passwordReset = $this->passwordResetRepository->findWithAttributes([
@@ -99,7 +99,7 @@ class PasswordResetController extends ApiController
         ]);
 
         if (!$passwordReset) {
-        	return $this->respondFailedParametersValidation('This password reset token is invalid.');
+        	return $this->respondFailedParametersValidation(trans('passwords.user'));
         }
 
         try {

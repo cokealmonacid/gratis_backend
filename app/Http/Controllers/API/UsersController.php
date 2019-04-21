@@ -55,7 +55,7 @@ class UsersController extends ApiController
                 return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
             }
 
-            return $this->respondBadRequest('The email and password dont match');
+            return $this->respondBadRequest(trans('messages.user_login_error'));
         } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
         }
@@ -65,7 +65,7 @@ class UsersController extends ApiController
     {
 
         $request->user('api')->token()->revoke();
-        return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => "Logout success."]);
+        return $this->setStatusCode(Response::HTTP_OK)->respond(["message" => trans('messages.user_logout_success')]);
 
     }
 

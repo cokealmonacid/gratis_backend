@@ -54,7 +54,7 @@ class UserRepository implements UserRepositoryInterface
     public function find($id)
     {
         if(null == $user = $this->user_model->find($id)){
-            throw new ModelNotFoundException("User not found");
+            throw new ModelNotFoundException(trans('messages.user_not_found'));
         }
         return $user;
 
@@ -68,16 +68,16 @@ class UserRepository implements UserRepositoryInterface
     {
 
         if(!$user = $this->user_model->where('email', $email)->first()){
-            throw new Exception("This email account does not exist");
+            throw new Exception(trans('messages.user_email_not_exist'));
         }
 
         if (!$rol = $this->rol_model->where('description', $rol_description)->first()){
-            throw new Exception("This rol does not exist");
+            throw new Exception(trans('messages.rol_not_exist'));
 
         }
         $match_these = ['user_id' => $user->id, 'rol_id' => $rol->id];
         if (!$this->user_rol_model->where($match_these)->first()){
-            throw new Exception("This email account does not exist");
+            throw new Exception(trans('messages.user_email_not_exist'));
 
         }
         return $user;
@@ -87,7 +87,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $user = $this->create($user_data);
         if (!$rol = $this->rol_model->where('description', $rol_description)->first()) {
-            throw new Exception("This rol does not exist");
+            throw new Exception(trans('messages.rol_not_exist'));
 
         }
         $this->rol_model->create([
@@ -102,12 +102,13 @@ class UserRepository implements UserRepositoryInterface
     {
         $_post = $this->post_model->where('id', $post_id)->first();
         if (!$_post) {
-            throw new Exception('Post not exist');
+            throw new Exception(trans('messages.post_not_exist'));
         }
         $user_like_post = $this->user_post_like_model->where('post_id', $_post->id)->where('user_id',$user_id)->first();
         if ($user_like_post ){
             if ($user_like_post->delete()) return null ;
-            else throw new Exception("Error in remove like post ");
+            else
+                throw new Exception(trans('messages.post_like_error_remove'));
         }
         else {
             $user_like_post = $this->user_post_like_model->create(

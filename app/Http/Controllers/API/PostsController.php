@@ -44,6 +44,7 @@ class PostsController  extends ApiController
 
     public function show(Request $request) 
     {
+
         $validator = Validator::make($request->all(), Post::rulesFilter());
 
         if ($validator->fails()) {
@@ -74,17 +75,17 @@ class PostsController  extends ApiController
 
         $tags = $this->check_tags($request->input('tags'));
         if (!$tags) {
-            return $this->respondFailedParametersValidation('The tags provided doesnt exist');
+            return $this->respondFailedParametersValidation(trans('validation.not_in',['attribute' => 'tag']));
         }
 
         $photos = $this->check_photos($request->input('photos'));
         if (!$photos) {
-            return $this->respondFailedParametersValidation('There is a problem with the images provided');
+            return $this->respondFailedParametersValidation(trans('validation.not_regex',['attribute' => 'imagen']));
         }
 
         $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
-            return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
+            return $this->respondFailedParametersValidation(trans('messages.post_error_parametros'));
         }
 
         $user = Auth::guard('api')->user();
@@ -97,7 +98,7 @@ class PostsController  extends ApiController
         ]);
 
         if (!$post) {
-            return $this->respondFailedParametersValidation('Error while internally saving an post');
+            return $this->respondBadRequest(trans('messages.post_save_error'));
         }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
@@ -112,22 +113,22 @@ class PostsController  extends ApiController
 
         $tags = $this->check_tags($request->input('tags'));
         if (!$tags) {
-            return $this->respondFailedParametersValidation('The tags provided doesnt exist');
+            return $this->respondFailedParametersValidation(trans('validation.not_in',['attribute' => 'tag']));
         }
 
         $photos = $this->check_photos($request->input('photos'));
         if (!$photos) {
-            return $this->respondFailedParametersValidation('There is a problem with the images provided');
+            return $this->respondFailedParametersValidation(trans('validation.not_regex',['attribute' => 'imagen']));
         }
 
         $provincia = $this->provinciaRepository->find($request->input('provincia_id'));
         if (!$provincia) {
-            return $this->respondFailedParametersValidation('Paramaters failed validation for a post');
+            return $this->respondFailedParametersValidation(trans('messages.post_error_parametros'));
         }
 
         $post = $this->postRepository->find($id);
         if (!$post) {
-            return $this->respondBadRequest('This post does not exist');
+            return $this->respondBadRequest(trans('validation.exists',['attribute' => 'post']));
         }
 
         $user = Auth::guard('api')->user();
@@ -147,14 +148,14 @@ class PostsController  extends ApiController
     public function updateState($id,Request $request){
         $state_id = $request->input('state_id');
         if (!$state_id) {
-            return $this->respondFailedParametersValidation('The state_id is requered.');
+            return $this->respondFailedParametersValidation(trans('validation.required',['attribute' => 'state']));
         }
         if (!$this->check_state_id($state_id)){
-            return $this->respondFailedParametersValidation('The state_id is not valid.');
+            return $this->respondFailedParametersValidation(trans('validation.exists',['attribute' => 'state_id']));
         }
         $post = $this->postRepository->find($id);
         if (!$post) {
-            return $this->respondBadRequest('This post does not exist');
+            return $this->respondBadRequest(trans('validation.exists',['attribute' => 'post']));
         }
         $user = Auth::guard('api')->user();
         if ($post->user_id != $user->id) {
@@ -166,7 +167,7 @@ class PostsController  extends ApiController
         ), $id);
 
         if (!$post) {
-            return $this->respondFailedParametersValidation('Error while internally saving an post');
+            return $this->respondBadRequest(trans('messages.post_save_error'));
         }
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->postTransformer->transform($post)]);
@@ -195,7 +196,7 @@ class PostsController  extends ApiController
                     ]);
             }
         } else {
-            return $this->respondBadRequest('Post not found');
+            return $this->respondBadRequest(trans('validation.exists',['attribute' => 'post']));
         }
     }
 

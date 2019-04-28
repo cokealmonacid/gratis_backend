@@ -44,13 +44,13 @@ class ReportReasonsController extends ApiController
         $post_id = $request->post_id;
         $post    = $this->postRepository->find($post_id);
         if (!$post) {
-            return $this->respondBadRequest('This post does not exist');
+            return $this->respondBadRequest(trans('validation.exists',['attribute' => 'post']));
         }
 
         $report_id = $request->report_id;
         $report    = $this->reportReasonRepository->find($report_id);
         if (!$report) {
-            return $this->respondBadRequest('This report does not exist');
+            return $this->respondBadRequest(trans('validation.exists',['attribute' => 'report']));
         }
 
         try {

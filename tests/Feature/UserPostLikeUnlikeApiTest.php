@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: entropia
- * Date: 10/22/18
- * Time: 10:41 PM
- */
 
 namespace Tests\Feature;
 

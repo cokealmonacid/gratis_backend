@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: entropia
- * Date: 9/20/18
- * Time: 4:11 PM
- */
 
 namespace App\Models;
 use Illuminate\Support\Str;

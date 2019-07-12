@@ -88,7 +88,7 @@ class PostRepository implements PostRepositoryInterface
             ->join('provincias','posts.provincia_id','=','provincias.id')
             ->join('regiones','provincias.region_id','=','regiones.id')
             ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail'],'page',$_page)
+            ->paginate('5',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page)
             ->appends( $data_filter );
 
         return $_posts;

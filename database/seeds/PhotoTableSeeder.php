@@ -15,8 +15,8 @@ class PhotoTableSeeder extends Seeder
      */
     public function run()
     {
-        $_image = base64_encode(file_get_contents('https://dummyimage.com/650x400/999/FFF'));
-        $_thumbnail = base64_encode(file_get_contents('https://dummyimage.com/250x250/999/FFF'));
+        $_image = base64_encode(file_get_contents('https://picsum.photos/600'));
+        $_thumbnail = base64_encode(file_get_contents('https://picsum.photos/250'));
 
         $Posts 		= Post::all();
 
@@ -26,7 +26,8 @@ class PhotoTableSeeder extends Seeder
                 'image'     => $_image,
                 'thumbnail' => $_thumbnail,
                 'extension'        => 'png'
-            ]);        }
+            ]);
+        }
 
     }
 }

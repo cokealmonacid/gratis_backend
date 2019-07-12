@@ -19,7 +19,7 @@ class PostTableSeeder extends Seeder
     {
     	$faker = Faker::create();
 
-    	for ($i=0; $i < 20; $i++) { 
+    	for ($i=0; $i < 100; $i++) { 
 
 			$count = rand(3, 7);
     		$user 		= User::inRandomOrder()->first();

@@ -21,7 +21,7 @@ class PostTableSeeder extends Seeder
 
     	for ($i=0; $i < 100; $i++) { 
 
-			$count = rand(3, 7);
+			$count = rand(3, 5);
     		$user 		= User::inRandomOrder()->first();
     		$state 		= State::inRandomOrder()->first();
     		$provincia 	= Provincia::inRandomOrder()->first();

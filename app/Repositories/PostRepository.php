@@ -111,9 +111,10 @@ class PostRepository implements PostRepositoryInterface
 
 	public function showDetail($id)
 	{
-		$post = Post::whereId($id)
-            ->first()
+        $post = Post::where('posts.id',$id)
             ->join('users','users.id', '=' ,'posts.user_id')
+            ->join('provincias', 'provincias.id', '=', 'posts.provincia_id')
+            ->join('regiones', 'regiones.id', '=', 'provincias.region_id')
             ->select(
                 'users.id as user_id'
                 ,'users.name as user_name'
@@ -123,7 +124,10 @@ class PostRepository implements PostRepositoryInterface
                 ,'posts.id as post_id'
                 ,'posts.title as post_title'
                 ,'posts.description as post_description'
+                ,'provincias.description as provincia_description'
+                ,'regiones.description as region_description'
             )->first();
+
 
         return $post;
 	}

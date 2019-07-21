@@ -23,6 +23,8 @@ class PostTransformer extends Transformer
                 'id'          => $post_detail['post_id'],
                 'title'       => $post_detail['post_title'],
                 'description' => $post_detail['post_description'],
+                'provincia'   => $post_detail['provincia_description'],
+                'region'      => $post_detail['region_description'],
                 'images'      => $post_photos
             ],
             'user' => [
@@ -42,6 +44,8 @@ class PostTransformer extends Transformer
                 'id'          => $post_detail['post_id'],
                 'title'       => $post_detail['post_title'],
                 'description' => $post_detail['post_description'],
+                'provincia'   => $post_detail['provincia_description'],
+                'region'      => $post_detail['region_description'],
                 'images'      => $post_photos
             ],
             'user' => [

@@ -17,22 +17,22 @@ class UsersTableSeeder extends Seeder
 
         User::create([
             'name'      => $faker->firstName,
-            'email'     => 'a@gmail.com',
-            'password'  => bcrypt('1234'),
+            'email'     => 'a@test.com',
+            'password'  => bcrypt('12345678'),
             'phone'     => $faker->e164PhoneNumber,
         ]);
 
         User::create([
             'name'     => $faker->firstName,
-            'email'    => 'b@gmail.com',
-            'password' => bcrypt('1234'),
+            'email'    => 'b@test.com',
+            'password' => bcrypt('12345678'),
             'phone'    => $faker->e164PhoneNumber,
         ]);
 
         User::create([
             'name'     => $faker->firstName,
-            'email'    => 'c@gmail.com',
-            'password' => bcrypt('1234'),
+            'email'    => 'c@test.com',
+            'password' => bcrypt('12345678'),
             'phone'    => $faker->e164PhoneNumber,
         ]);
     }

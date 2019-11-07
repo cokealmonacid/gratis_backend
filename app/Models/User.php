@@ -37,6 +37,7 @@ class User extends Authenticatable
     public static function rulesForCreate()
     {
         return [
+            'name'      => 'required|min:6',
             'email'     => 'required|email|unique:users',
             'password'  => 'required|min:8'
         ];

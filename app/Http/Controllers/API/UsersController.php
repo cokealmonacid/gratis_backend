@@ -85,16 +85,17 @@ class UsersController extends ApiController
             return $this->respondFailedParametersValidation($error_message);
         }
 
+        $_name  = $request->input('name');
         $_email = $request->input('email');
         $_password = $request->input('password');
 
         try {
-            $user = $this->userRepository->addUser(['email' => $_email, 'password' => bcrypt($_password)], 'user');
+            $user = $this->userRepository->addUser(['name' => $_name, 'email' => $_email, 'password' => bcrypt($_password)], 'user');
         } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
         }
 
-        return $this->setStatusCode(Response::HTTP_CREATED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transformUserDetail($user), 'client_token' => $this->setToken($user)]);
     }
 
     public function update(Request $request)

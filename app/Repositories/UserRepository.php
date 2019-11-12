@@ -96,7 +96,7 @@ class UserRepository implements UserRepositoryInterface
             throw new Exception(trans('messages.rol_not_exist'));
 
         }
-        $this->rol_model->create([
+        $this->user_rol_model->create([
             'user_id' => $user->id,
             'rol_id' => $rol->id
         ]);

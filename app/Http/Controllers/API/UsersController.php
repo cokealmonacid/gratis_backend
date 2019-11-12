@@ -45,6 +45,10 @@ class UsersController extends ApiController
         if (!$email or !$password) {
             return $this->respondFailedParametersValidation();
         }
+
+            $user_rol = 'user';
+            $user = $this->userRepository->findWithMailRol($email, $user_rol);
+
         try {
             $user_rol = 'user';
             $user = $this->userRepository->findWithMailRol($email, $user_rol);

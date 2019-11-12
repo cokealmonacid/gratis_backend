@@ -37,4 +37,9 @@ class UserPostLikeRepository implements RepositoryInterface
 	{
 		return $this->user_post_like_model->where('user_id', $id)->pluck('post_id');
 	}
+
+	public function findPost($user_id, $post_id)
+	{
+		return $this->user_post_like_model->where(['user_id' => $user_id, 'post_id' => $post_id])->first();
+	}
 }

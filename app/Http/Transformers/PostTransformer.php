@@ -16,7 +16,7 @@ class PostTransformer extends Transformer
         ];
     }
 
-    public function transformPostDetailUsers($post_detail, $post_photos)
+    public function transformPostDetailUsers($post_detail, $post_photos, $post_like)
     {
         return [
             'post' => [
@@ -33,7 +33,8 @@ class PostTransformer extends Transformer
                 'email' => $post_detail['user_email'],
                 'name'  => $post_detail['user_name'],
                 'avatar'=> $post_detail['user_avatar']
-            ]
+            ],
+            'like' => $post_like ? true : false
         ];
     }
 

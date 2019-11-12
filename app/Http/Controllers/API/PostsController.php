@@ -183,9 +183,10 @@ class PostsController  extends ApiController
 
             $post_photos = $this->photoRepository->select($post->id);
             if ( $request->user('api') ) {
+                $post_like = $this->userPostLikeRepository->findPost($request->user('api')->id, $id);
                 return $this
                     ->setStatusCode(Response::HTTP_OK)
-                    ->respond(['data' => $this->postTransformer->transformPostDetailUsers($post_detail,$post_photos)]);
+                    ->respond(['data' => $this->postTransformer->transformPostDetailUsers($post_detail,$post_photos, $post_like)]);
 
             } else {
                 return $this

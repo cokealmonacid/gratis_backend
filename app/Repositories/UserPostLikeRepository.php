@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\User_Post_Like;
+use App\Models\Post;
 
 class UserPostLikeRepository implements RepositoryInterface
 {
@@ -42,4 +43,20 @@ class UserPostLikeRepository implements RepositoryInterface
 	{
 		return $this->user_post_like_model->where(['user_id' => $user_id, 'post_id' => $post_id])->first();
 	}
+
+	public function show($user_id, array $data_search){
+		$_page          = $data_search["page"];
+
+        $_postsFavoirites = Post::where('state_id','=',1)
+		->groupBy('posts.id')
+		->join('user_post_likes', 'user_post_likes.post_id', '=','posts.id')
+        ->join('photos', 'photos.post_id', '=', 'posts.id')
+        ->join('provincias','posts.provincia_id','=','provincias.id')
+        ->join('regiones','provincias.region_id','=','regiones.id')
+        ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
+        ->paginate('8',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
+		
+		return $_postsFavoirites;
+	}
+
 }

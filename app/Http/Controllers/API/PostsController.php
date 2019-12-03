@@ -174,7 +174,7 @@ class PostsController  extends ApiController
 
     }
 
-    public function showDetail($id, Request $request) 
+    public function showDetail($id, Request $request)
     {
         $post = $this->postRepository->find($id);
         if ($post) {
@@ -218,11 +218,19 @@ class PostsController  extends ApiController
             return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => null]);
         }
 
+        $data_search = [
+            "page"         => $request->input('page')
+        ];
+
         $favourites = Collect();
-        foreach ($user_likes as $like) {
+
+        $favourites = $this->userPostLikeRepository->show($user->id, $data_search);
+      /*  foreach ($user_likes as $like) {
             $post = $this->postRepository->find($like);
-            $favourites->push($this->postTransformer->transform($post));
-        }
+            $post_detail = $this->postRepository->showDetail($post->id);
+            $post_photos = $this->photoRepository->select($post->id);
+            $favourites->push($this->postTransformer->transformPostFavorite($post_detail, $post_photos));
+        }*/
 
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }

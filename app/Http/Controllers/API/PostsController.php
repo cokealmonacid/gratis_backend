@@ -225,13 +225,7 @@ class PostsController  extends ApiController
         $favourites = Collect();
 
         $favourites = $this->userPostLikeRepository->show($user->id, $data_search);
-      /*  foreach ($user_likes as $like) {
-            $post = $this->postRepository->find($like);
-            $post_detail = $this->postRepository->showDetail($post->id);
-            $post_photos = $this->photoRepository->select($post->id);
-            $favourites->push($this->postTransformer->transformPostFavorite($post_detail, $post_photos));
-        }*/
-
+        
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
 

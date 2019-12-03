@@ -17,7 +17,7 @@ class UserPostLikeRepository implements RepositoryInterface
 	public function all()
 	{
 		return $this->user_post_like_model->all();
-	}	
+	}
 
 	public function create(array $data)
 	{
@@ -55,7 +55,6 @@ class UserPostLikeRepository implements RepositoryInterface
         ->join('regiones','provincias.region_id','=','regiones.id')
         ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
         ->paginate('8',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
-		
 		return $_postsFavoirites;
 	}
 

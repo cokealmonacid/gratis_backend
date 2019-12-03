@@ -22,7 +22,7 @@ class PostRepository implements PostRepositoryInterface
 	public function all()
 	{
 		return $this->post_model->all();
-	}	
+    }
 
 	public function create(array $data)
 	{
@@ -151,6 +151,6 @@ class PostRepository implements PostRepositoryInterface
                 'thumbnail' => $this->photo_model->createThumbnail($photo['content']),
                 'principal' => $photo['principal']
             ]);
-        }   
+        }
     }
 }

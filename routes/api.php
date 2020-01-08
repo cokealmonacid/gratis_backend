@@ -31,6 +31,12 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
     Route::get('/password/find/{token}', 'PasswordResetController@find');
     Route::post('/password/reset', 'PasswordResetController@reset');
 
+    /** Regions **/
+    Route::get('/regions', 'RegionsController@index');
+
+    /** Tags **/
+    Route::get('/tags', 'TagsController@index');
+
 });
 
 Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API'], function() {

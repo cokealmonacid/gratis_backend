@@ -133,37 +133,9 @@ class UsersController extends ApiController
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
 
-    public function redirectToProvider()
+    public function loginFacebook(Request $request)
     {
-        return Socialite::driver('facebook')->stateless()->redirect();
-    }
 
-    public function handleProviderCallback()
-    {
-        try {
-            $providerUser = Socialite::driver('facebook')->stateless()->user();
-        } catch (Exception $e) {
-            return $this->respondInternalError();
-        }
-        if ($user = $this->userRepository->findFirstWithAtribute('email', $providerUser->getEmail())) {
-            $this->userRepository->update(['provider_id' => $providerUser->getId()], $user->id);
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
-        }
-        if ($user = $this->userRepository->findFirstWithAtribute('provider_id', $providerUser->getId())) {
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
-        }
-
-        $user = $this->userRepository->create([
-            'name' => $providerUser->getName(),
-            'email' => $providerUser->getEmail(),
-            'provider_id' => $providerUser->getId()
-        ]);
-
-        if (!$user) {
-            return $this->respondInternalError();
-        }
-
-        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
     }
 
     public function likePost(Request $request)

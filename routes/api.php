@@ -16,8 +16,7 @@ use Illuminate\Http\Request;
 Route::group(['prefix' => 'v1', 'namespace' => 'API'], function() {
 	/** Users **/
     Route::post('/users/login', 'UsersController@login');
-	Route::get('/users/login/redirect/facebook', 'UsersController@redirectToProvider');
-    Route::get('/users/login/facebook', 'UsersController@handleProviderCallback');
+    Route::post('/users/login/facebook', 'UsersController@loginFacebook');
     Route::post('/users', 'UsersController@create');
 
 

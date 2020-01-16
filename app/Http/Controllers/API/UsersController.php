@@ -135,7 +135,33 @@ class UsersController extends ApiController
 
     public function loginFacebook(Request $request)
     {
+        $validator = Validator::make($request->all(), User::facebookRules());
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation('Uno o más parámetros no son válidos.');
+        }
 
+        $match = [
+            'avatar' => $request->avatar,
+            'name' => $request->name,
+            'facebookId' => $request->facebookId,
+            'facebookToken' => $request->facebookToken,
+            'email' => $request->email
+        ];
+
+        try {
+            $user = $this->userRepository->findWithMail($request->email);
+            if ($user) {
+                $user = $this->userRepository->update($match, $user->id);
+            } else {
+                $this->userRepository->addUser($match, 'user');
+            }
+        } catch (Exception $e) {
+            return $this->respondBadRequest($e->getMessage());
+        }
+
+        $user = $this->userRepository->findWithMail($request->email);
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transformUserDetail($user), 'client_token' => $this->setToken($user)]);
     }
 
     public function likePost(Request $request)

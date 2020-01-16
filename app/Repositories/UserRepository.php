@@ -101,7 +101,6 @@ class UserRepository implements UserRepositoryInterface
             'rol_id' => $rol->id
         ]);
         return $user;
-
     }
 
     public function addUserLikePost($user_id, $post_id)
@@ -125,7 +124,10 @@ class UserRepository implements UserRepositoryInterface
             );
         }
         return $user_like_post;
+    }
 
-
+    public function findWithMail(String $email)
+    {
+        return $this->user_model->where('email', $email)->first();
     }
 }

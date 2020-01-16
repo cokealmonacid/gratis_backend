@@ -73,7 +73,7 @@ class UserLoginApiTest extends TestCase
 
         $data = [
             'email'    => $user->email,
-            'password' => $user->email
+            'password' => $user->email,
         ];
 
         $response = $this->postJson('api/v1/users/login', $data);

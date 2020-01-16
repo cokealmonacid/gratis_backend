@@ -46,20 +46,15 @@ class UsersController extends ApiController
             return $this->respondFailedParametersValidation();
         }
 
-            $user_rol = 'user';
-            $user = $this->userRepository->findWithMailRol($email, $user_rol);
-
         try {
             $user_rol = 'user';
             $user = $this->userRepository->findWithMailRol($email, $user_rol);
             $attempt = Auth::attempt(['email' => $email, 'password' => $password]);
-
-            if ($attempt) {
-
-                return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+            if (!$attempt) {
+                throw new Exception('La contraseña ingresada es incorrecta.');
             }
 
-            return $this->respondBadRequest(trans('messages.user_login_error'));
+            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
         } catch (Exception $e) {
             return $this->respondBadRequest($e->getMessage());
         }

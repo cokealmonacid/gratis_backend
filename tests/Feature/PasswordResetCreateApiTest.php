@@ -31,7 +31,6 @@ class PasswordResetCreateApiTest extends TestCase
         $response->assertStatus(422);
     }
 
-    /** @test */
     public function it_create_password_reset()
     {
         $email    = $this->faker->freeEmail();

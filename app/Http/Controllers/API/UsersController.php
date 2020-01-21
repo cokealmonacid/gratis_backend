@@ -128,37 +128,35 @@ class UsersController extends ApiController
         return $this->setStatusCode(Response::HTTP_ACCEPTED)->respond(['data' => $this->userTransformer->transformUserDetail($user)]);
     }
 
-    public function redirectToProvider()
+    public function loginFacebook(Request $request)
     {
-        return Socialite::driver('facebook')->stateless()->redirect();
-    }
+        $validator = Validator::make($request->all(), User::facebookRules());
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation('Uno o más parámetros no son válidos.');
+        }
 
-    public function handleProviderCallback()
-    {
+        $match = [
+            'avatar' => $request->avatar,
+            'name' => $request->name,
+            'facebookId' => $request->facebookId,
+            'facebookToken' => $request->facebookToken,
+            'email' => $request->email
+        ];
+
         try {
-            $providerUser = Socialite::driver('facebook')->stateless()->user();
+            $user = $this->userRepository->findWithMail($request->email);
+            if ($user) {
+                $user = $this->userRepository->update($match, $user->id);
+            } else {
+                $this->userRepository->addUser($match, 'user');
+            }
         } catch (Exception $e) {
-            return $this->respondInternalError();
-        }
-        if ($user = $this->userRepository->findFirstWithAtribute('email', $providerUser->getEmail())) {
-            $this->userRepository->update(['provider_id' => $providerUser->getId()], $user->id);
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
-        }
-        if ($user = $this->userRepository->findFirstWithAtribute('provider_id', $providerUser->getId())) {
-            return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+            return $this->respondBadRequest($e->getMessage());
         }
 
-        $user = $this->userRepository->create([
-            'name' => $providerUser->getName(),
-            'email' => $providerUser->getEmail(),
-            'provider_id' => $providerUser->getId()
-        ]);
+        $user = $this->userRepository->findWithMail($request->email);
 
-        if (!$user) {
-            return $this->respondInternalError();
-        }
-
-        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transform($user), 'client_token' => $this->setToken($user)]);
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $this->userTransformer->transformUserDetail($user), 'client_token' => $this->setToken($user)]);
     }
 
     public function likePost(Request $request)

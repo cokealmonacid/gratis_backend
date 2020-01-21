@@ -51,6 +51,17 @@ class User extends Authenticatable
         ];
     }
 
+    public static function facebookRules()
+    {
+        return [
+            'facebookId'    => 'required',
+            'name'          => 'required',
+            'email'         => 'required|email',
+            'avatar'        => 'required|imageable',
+            'facebookToken' => 'required',
+        ];
+    }
+
     public static function rulesForAvatar()
     {
         return [

@@ -19,6 +19,22 @@ class UserLoginSocialApiTest extends TestCase
 		$response->assertStatus(422);
 	}
 
+    /** @test */
+    public function it_throws_facebookToken_mismatch()
+    {
+        $response = $this->post('api/v1/users/login/facebook');
+
+        $data = [
+            'email' => $this->faker->freeEmail(),
+            'name'  => $this->faker->name,
+            'facebookId' => $this->faker->md5,
+            'facebookToken' => $this->faker->md5,
+            'avatar' => 'https://picsum.photos/600'
+        ];
+
+        $response->assertStatus(422);
+    }
+
 	/** @test */
 	public function logins_existing_user()
 	{
@@ -32,11 +48,14 @@ class UserLoginSocialApiTest extends TestCase
             ]
         );
 
+        $facebookId = $this->faker->md5;
+        $facebookToken = md5($facebookId.$user->email.'gratis');
+
         $data = [
         	'email' => $user->email,
         	'name'  => $this->faker->name,
-        	'facebookId' => $this->faker->md5,
-        	'facebookToken' => $this->faker->md5,
+        	'facebookId' => $facebookId,
+        	'facebookToken' => $facebookToken,
         	'avatar' => 'https://picsum.photos/600'
         ];
 
@@ -48,12 +67,16 @@ class UserLoginSocialApiTest extends TestCase
 	/** @test */
 	public function logins_and_create_user()
 	{
+        $email      = $this->faker->freeEmail();
+        $facebookId = $this->faker->md5;
+        $facebookToken = md5($facebookId.$email.'gratis');
+
         $data = [
-        	'email' => $this->faker->freeEmail(),
-        	'name'  => $this->faker->name,
-        	'facebookId' => $this->faker->md5,
-        	'facebookToken' => $this->faker->md5,
-        	'avatar' => 'https://picsum.photos/600'
+        	'email' => $email,
+            'name'  => $this->faker->name,
+            'facebookId' => $facebookId,
+            'facebookToken' => $facebookToken,
+            'avatar' => 'https://picsum.photos/600'
         ];
 
 		$response = $this->post('api/v1/users/login/facebook', $data);

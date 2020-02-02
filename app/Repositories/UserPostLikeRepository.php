@@ -51,10 +51,11 @@ class UserPostLikeRepository implements RepositoryInterface
 		->groupBy('posts.id')
 		->join('user_post_likes', 'user_post_likes.post_id', '=','posts.id')
         ->join('photos', 'photos.post_id', '=', 'posts.id')
+        ->join('states', 'states.id', '=', 'posts.state_id')
         ->join('provincias','posts.provincia_id','=','provincias.id')
         ->join('regiones','provincias.region_id','=','regiones.id')
         ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-        ->paginate('8',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
+        ->paginate('8',['posts.id as id','posts.publish_date as publishDate','states.id as statesId','states.description as statesDescription','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
 		return $_postsFavoirites;
 	}
 

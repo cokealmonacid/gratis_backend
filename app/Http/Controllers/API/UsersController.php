@@ -135,6 +135,11 @@ class UsersController extends ApiController
             return $this->respondFailedParametersValidation('Uno o más parámetros no son válidos.');
         }
 
+        $validateToken = $this->checkFBToken($request);
+        if (!$validateToken) {
+           return $this->respondFailedParametersValidation('Uno o más parámetros no son válidos.'); 
+        }
+
         $match = [
             'avatar' => $request->avatar,
             'name' => $request->name,
@@ -193,5 +198,13 @@ class UsersController extends ApiController
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse($tokenResult->token->expires_at)->toDateTimeString()
         ];
+    }
+
+    private function checkFBToken($request)
+    {
+        $encryptedToken = md5($request->facebookId.$request->email.'gratis');
+        $response = !strcmp($encryptedToken, $request->facebookToken);
+
+        return $response;
     }
 }

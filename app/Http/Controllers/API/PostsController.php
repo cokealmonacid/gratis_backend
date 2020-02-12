@@ -228,6 +228,19 @@ class PostsController  extends ApiController
         
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
+     public function showMyPosts(Request $request){
+        $user = $request->user('api');
+
+        $data_search = [
+            "page"         => $request->input('page')
+        ];
+
+        $myPosts = Collect();
+
+        $myPosts = $this->postRepository->showUserPosts($user->id, $data_search);
+        
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $myPosts]);
+     }
 
     private function check_tags($tags)
     {

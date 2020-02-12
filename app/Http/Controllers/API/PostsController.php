@@ -230,7 +230,12 @@ class PostsController  extends ApiController
     }
      public function showMyPosts(Request $request){
         $user = $request->user('api');
+        $validator = Validator::make($request->all(), Post::rulesFilter());
 
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation($validator->errors()->first());
+        }
+        
         $data_search = [
             "page"         => $request->input('page')
         ];

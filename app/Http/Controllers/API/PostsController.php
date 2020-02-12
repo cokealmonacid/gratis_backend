@@ -201,10 +201,22 @@ class PostsController  extends ApiController
         }
     }
 
-    public function showUserPosts ($user_id)
+    public function showUserPosts ($user_id, Request $request)
     {
-        $_posts = $this->postRepository->showUserPosts($user_id);
-        return $this->setStatusCode(Response::HTTP_OK)->respond($_posts);
+        $validator = Validator::make($request->all(), Post::rulesFilter());
+
+        if ($validator->fails()) {
+            return $this->respondFailedParametersValidation($validator->errors()->first());
+        }
+        
+        $data_search = [
+            "page"         => $request->input('page')
+        ];
+
+        $userPost = Collect();
+
+        $userPost = $this->postRepository->showUserPosts($user_id, $data_search);
+        return $this->setStatusCode(Response::HTTP_OK)->respond($userPost);
 
 
     }
@@ -235,7 +247,7 @@ class PostsController  extends ApiController
         if ($validator->fails()) {
             return $this->respondFailedParametersValidation($validator->errors()->first());
         }
-        
+
         $data_search = [
             "page"         => $request->input('page')
         ];

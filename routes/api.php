@@ -50,6 +50,7 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
     Route::put('/posts/{id}', 'PostsController@update');
     Route::put('/posts/state/{id}', 'PostsController@updateState');
     Route::get('/favourites', 'PostsController@favourites');
+    Route::get('/posts', 'PostsController@showMyPosts');
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');

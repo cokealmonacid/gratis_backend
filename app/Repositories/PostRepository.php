@@ -56,7 +56,7 @@ class PostRepository implements PostRepositoryInterface
 
 		$this->post_tags($id, $tags);
 
-		$this->post_photos($id, $photos);
+		$this->post_photos($id, $photos, true);
 
 		return $post;
 	}
@@ -143,15 +143,15 @@ class PostRepository implements PostRepositoryInterface
         }
     }
 
-    private function post_photos($post_id, $photos)
+    private function post_photos($post_id, $photos, $update = false)
     {
+        if ($update) {
+            $this->removePostPhotos($post_id);
+        }
+
         foreach($photos as $key => $photo) {
 
-            $name = $post_id . rand();
-
-            $_image = Helper::resizeImage($photo['content']);
-
-            $image = Helper::uploadImage($post_id, $name, $_image);
+            $image = $this->manageImages($photo, $post_id);
 
             $this->photo_model->create([
                 'post_id'   => $post_id,
@@ -159,6 +159,26 @@ class PostRepository implements PostRepositoryInterface
                 'filename'  => $image['dir'],
                 'principal' => $key == 0 ? true : false,
             ]);
+        }
+    }
+
+    private function manageImages($photo, $post_id)
+    {
+        $name = $post_id . rand();
+
+        $_image = Helper::resizeImage($photo['content']);
+
+        $image = Helper::uploadImage($post_id, $name, $_image);
+
+        return $image;
+    }
+
+    private function removePostPhotos($post_id)
+    {
+        $photos = $this->post_model->select($post_id);
+        foreach($photos as $photo) {
+            Helper::deleteImage($photo->filename);
+            $this->post_model->delete($photo->id);
         }
     }
 }

@@ -21,9 +21,8 @@ class Photo extends Model
      */
     protected $fillable = [
         'post_id',
-        'image',
-        'thumbnail',
-        'extension',
+        'url',
+        'filename',
         'principal'
     ];
 

@@ -16,9 +16,8 @@ class CreatePhotosTable extends Migration
         Schema::create('photos', function (Blueprint $table) {
             $table->uuid('id');
             $table->string('post_id');
-            $table->longText('image');
-            $table->longText('thumbnail');
-            $table->string('extension');
+            $table->string('url');
+            $table->string('filename')->nullable();
             $table->boolean('principal')->default(false);
             $table->timestamps();
 

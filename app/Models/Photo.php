@@ -27,9 +27,9 @@ class Photo extends Model
     ];
 
     public static function rules(){
+
         return [
-            'content'         => 'required|imageable',
-            'principal'       => 'required',        
+            'content'         => 'required|imageable',     
         ];
     }
 

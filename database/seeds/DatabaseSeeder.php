@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
         $this->call(UserRolTableSeeder::class);
         $this->call(TagsTableSeeder::class);
         $this->call(ProvinciasTableSeeder::class);
-        $this->call(PostTableSeeder::class);
-        $this->call(PhotoTableSeeder::class);
-        $this->call(UserPostLikeTableSeeder::class);
-        $this->call(PostTagsTableSeeder::class);
-        $this->call(ReportReasonsTableSeeder::class);
+        // $this->call(PostTableSeeder::class);
+        // $this->call(PhotoTableSeeder::class);
+        // $this->call(UserPostLikeTableSeeder::class);
+        // $this->call(PostTagsTableSeeder::class);
+        // $this->call(ReportReasonsTableSeeder::class);
     }
 }

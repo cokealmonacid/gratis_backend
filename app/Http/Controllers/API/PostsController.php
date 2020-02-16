@@ -240,6 +240,7 @@ class PostsController  extends ApiController
         
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
+
      public function showMyPosts(Request $request){
         $user = $request->user('api');
         $validator = Validator::make($request->all(), Post::rulesFilter());

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: entropia
- * Date: 12/10/18
- * Time: 3:33 PM
- */
 
 namespace App\Repositories;
 use Exception;
@@ -14,7 +8,7 @@ use App\Models\Rol;
 use App\Models\Post;
 use App\Models\User_Post_Like;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
+use App\Http\Helper;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -49,6 +43,13 @@ class UserRepository implements UserRepositoryInterface
         if (isset($data['password'])) {
             $data['password'] = bcrypt($data['password']);
         }
+
+        if (isset($data['avatar'])) {
+            $url = $this->manageImages($data['avatar'], $id);
+
+            $data['avatar'] = $url['url'];
+        }
+
         return $this->user_model->where('id', $id)->update($data);
     }
 
@@ -129,5 +130,14 @@ class UserRepository implements UserRepositoryInterface
     public function findWithMail(String $email)
     {
         return $this->user_model->where('email', $email)->first();
+    }
+
+    private function manageImages($photo, $user_id)
+    {
+        $_image = Helper::resizeImage($photo);
+
+        $image = Helper::uploadImage($user_id, 'avatar', $_image);
+
+        return $image;
     }
 }

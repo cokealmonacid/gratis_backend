@@ -29,8 +29,7 @@ class PostGetDetailsApiTest extends TestCase
     {
         $_id_post = $this->getIdPostRandom();
         $response = $this->getJson("api/v1/posts/{$_id_post}");
-        $response_user_content = json_decode($response->getContent())->data->user;
-            $response->assertStatus(200);
+        $response->assertStatus(200);
 
     }
 
@@ -41,9 +40,7 @@ class PostGetDetailsApiTest extends TestCase
         $_id_post = $this->getIdPostRandom();
         $response = $this->getJson("api/v1/posts/{$_id_post}");
         $response_user_content = json_decode($response->getContent())->data->user;
-         $response->assertStatus(200);
-
-
+        $response->assertStatus(200);
     }
 
 

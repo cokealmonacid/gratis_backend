@@ -182,6 +182,7 @@ class PostsController  extends ApiController
             $post_detail = $this->postRepository->showDetail($post->id);
 
             $post_photos = $this->photoRepository->select($post->id);
+
             if ( $request->user('api') ) {
                 $post_like = $this->userPostLikeRepository->findPost($request->user('api')->id, $id);
                 return $this

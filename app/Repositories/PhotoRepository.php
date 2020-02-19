@@ -30,7 +30,7 @@ class PhotoRepository implements PhotoRepositoryInterface
 
 	public function delete($id)
 	{
-		return $this->photo_model->where('post_id', $id)->delete();
+		return $this->photo_model->whereId($id)->delete();
 	}
 
 	public function find($id)

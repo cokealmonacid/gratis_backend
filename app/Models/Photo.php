@@ -21,16 +21,15 @@ class Photo extends Model
      */
     protected $fillable = [
         'post_id',
-        'image',
-        'thumbnail',
-        'extension',
+        'url',
+        'filename',
         'principal'
     ];
 
     public static function rules(){
+
         return [
-            'content'         => 'required|imageable',
-            'principal'       => 'required',        
+            'content'         => 'required|imageable',     
         ];
     }
 

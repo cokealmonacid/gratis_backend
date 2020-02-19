@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Post;
 use App\Models\Post_Tags;
 use App\Models\Photo;
+use App\Http\Helper;
 
 class PostRepository implements PostRepositoryInterface
 {
@@ -55,7 +56,7 @@ class PostRepository implements PostRepositoryInterface
 
 		$this->post_tags($id, $tags);
 
-		$this->post_photos($id, $photos);
+		$this->post_photos($id, $photos, true);
 
 		return $post;
 	}
@@ -88,7 +89,7 @@ class PostRepository implements PostRepositoryInterface
             ->join('provincias','posts.provincia_id','=','provincias.id')
             ->join('regiones','provincias.region_id','=','regiones.id')
             ->leftjoin('post_tags','post_tags.post_id','=','posts.id')
-            ->paginate('8',['posts.id as id','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page)
+            ->paginate('8',['posts.id as id','posts.title as title','posts.description as description', 'photos.url as url', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page)
             ->appends( $data_filter );
 
         return $_posts;
@@ -104,7 +105,7 @@ class PostRepository implements PostRepositoryInterface
         ->join('provincias','posts.provincia_id','=','provincias.id')
         ->join('regiones','provincias.region_id','=','regiones.id')
         ->where('posts.user_id', '=' , $user_id )
-        ->paginate('8',['posts.id as id','posts.publish_date as publishDate','states.id as statesId','states.description as statesDescription','posts.title as title','posts.description as description', 'photos.thumbnail as thumbnail', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
+        ->paginate('8',['posts.id as id','posts.publish_date as publishDate','states.id as statesId','states.description as statesDescription','posts.title as title','posts.description as description', 'photos.url as url', 'regiones.description as region', 'provincias.description as provincia'],'page',$_page);
 		return $_postsFavoirites;
 	}
     
@@ -142,15 +143,42 @@ class PostRepository implements PostRepositoryInterface
         }
     }
 
-    private function post_photos($post_id, $photos)
+    private function post_photos($post_id, $photos, $update = false)
     {
-        foreach($photos as $photo) {
+        if ($update) {
+            $this->removePostPhotos($post_id);
+        }
+
+        foreach($photos as $key => $photo) {
+
+            $image = $this->manageImages($photo, $post_id);
+
             $this->photo_model->create([
                 'post_id'   => $post_id,
-                'image'     => $photo['content'],
-                'thumbnail' => $this->photo_model->createThumbnail($photo['content']),
-                'principal' => $photo['principal']
+                'url'       => $image['url'],
+                'filename'  => $image['dir'],
+                'principal' => $key == 0 ? true : false,
             ]);
+        }
+    }
+
+    private function manageImages($photo, $post_id)
+    {
+        $name = $post_id . rand();
+
+        $_image = Helper::resizeImage($photo['content']);
+
+        $image = Helper::uploadImage($post_id, $name, $_image);
+
+        return $image;
+    }
+
+    private function removePostPhotos($post_id)
+    {
+        $photos = $this->post_model->select($post_id);
+        foreach($photos as $photo) {
+            Helper::deleteImage($photo->filename);
+            $this->post_model->delete($photo->id);
         }
     }
 }

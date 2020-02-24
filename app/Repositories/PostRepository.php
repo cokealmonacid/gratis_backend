@@ -81,8 +81,8 @@ class PostRepository implements PostRepositoryInterface
 
         $_posts = Post::where('state_id','=',1)
             ->where('title', 'like', '%' . $_name . '%')
-            ->whereRaw("(provincia_id = '{$_region_id}' or '{$_region_id}' = '' )")
-            ->whereRaw("(regiones.id = '{$_provincia_id}' or '{$_provincia_id}' = '' )")
+            ->whereRaw("(provincia_id = '{$_provincia_id}' or '{$_provincia_id}' = '' )")
+            ->whereRaw("(regiones.id = '{$_region_id}' or '{$_region_id}' = '' )")
             ->whereRaw("(post_tags.tag_id = '{$_tag_id}' or '{$_tag_id}' = '' )")
             ->groupBy('posts.id')
             ->join('photos', 'photos.post_id', '=', 'posts.id')

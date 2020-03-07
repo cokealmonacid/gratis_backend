@@ -13,11 +13,16 @@ class TagsTableSeeder extends Seeder
      */
     public function run()
     {
-        $faker = Faker::create();
+        $categories = [
+            'Muebles',
+            'Electrodomésticos',
+            'Vestuario',
+            'Calzado',
+        ];
 
-        foreach(range(1, 30) as $index) {
+        for ($i = 0; $i < count($categories); $i++) { 
             Tag::create([
-                'description' => $faker->word
+                'description' => $categories[$i]
             ]);
         }
     }

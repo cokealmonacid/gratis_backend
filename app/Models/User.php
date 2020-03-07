@@ -57,7 +57,7 @@ class User extends Authenticatable
             'facebookId'    => 'required',
             'name'          => 'required',
             'email'         => 'required|email',
-            'avatar'        => 'required',
+            'avatar'        => 'required|imageable',
             'facebookToken' => 'required',
         ];
     }

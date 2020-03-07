@@ -16,7 +16,7 @@ class UserCreateApiTest extends TestCase
     /** @test */
     public function createUser()
     {
-        $_name     = $this->faker->text($minNbChars = 8);
+        $_name     = $this->faker->name();
         $_email    = $this->faker->freeEmail();
         $_password = "123456789";
 

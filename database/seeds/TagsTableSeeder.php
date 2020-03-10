@@ -14,10 +14,12 @@ class TagsTableSeeder extends Seeder
     public function run()
     {
         $categories = [
-            'Muebles',
-            'Electrodomésticos',
-            'Vestuario',
-            'Calzado',
+            'Hogar',
+            'Vestuario y calzado',
+            'Futura mamá, bebés y niños',
+            'Tiempo libre',
+            'Computadores y electrónica',
+            'Otros productos'
         ];
 
         for ($i = 0; $i < count($categories); $i++) { 

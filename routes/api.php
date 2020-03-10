@@ -51,6 +51,7 @@ Route::group(['prefix' => 'v1','middleware'=>['auth:api'] ,'namespace' => 'API']
     Route::put('/posts/state/{id}', 'PostsController@updateState');
     Route::get('/favourites', 'PostsController@favourites');
     Route::get('/posts', 'PostsController@showMyPosts');
+    Route::get('/info', 'PostsController@infoForCreate');
 
     /** User Post */
     Route::post('users/post/like', 'UsersController@likePost');

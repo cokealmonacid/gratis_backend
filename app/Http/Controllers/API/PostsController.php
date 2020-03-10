@@ -6,6 +6,7 @@ use App\Repositories\PostRepository as PostRepository;
 use App\Repositories\PhotoRepository as PhotoRepository;
 use App\Repositories\StateRespository as StateRepository;
 use App\Repositories\ProvinciaRepository as ProvinciaRepository;
+use App\Repositories\RegionRepository as RegionRepository;
 use App\Repositories\TagRepository as TagRepository;
 use App\Repositories\UserPostLikeRepository as UserPostLikeRepository;
 
@@ -25,13 +26,12 @@ class PostsController  extends ApiController
      */
     protected $postTransformer;
 
-
     /**
      * @param PostTransformer $postTransformer
      */
     function __construct(PostTransformer $postTransformer, PostRepository $postRepository, 
         ProvinciaRepository $provinciaRepository, UserPostLikeRepository $userPostLikeRepository,
-        TagRepository $tagRepository, PhotoRepository $photoRepository,StateRepository $stateRespository)
+        TagRepository $tagRepository, PhotoRepository $photoRepository,StateRepository $stateRespository, RegionRepository $regionRepository)
     {
         $this->photoRepository = $photoRepository;
         $this->postRepository = $postRepository;
@@ -40,6 +40,7 @@ class PostsController  extends ApiController
         $this->userPostLikeRepository = $userPostLikeRepository;
         $this->tagRepository = $tagRepository;
         $this->stateRespository = $stateRespository;
+        $this->regionRepository = $regionRepository;
     }
 
     public function show(Request $request) 
@@ -242,7 +243,8 @@ class PostsController  extends ApiController
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $favourites]);
     }
 
-     public function showMyPosts(Request $request){
+    public function showMyPosts(Request $request)
+    {
         $user = $request->user('api');
         $validator = Validator::make($request->all(), Post::rulesFilter());
 
@@ -259,7 +261,18 @@ class PostsController  extends ApiController
         $myPosts = $this->postRepository->showUserPosts($user->id, $data_search);
         
         return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $myPosts]);
-     }
+    }
+
+    public function infoForCreate()
+    {
+        $data = [
+            'tags'    => $this->tagRepository->all(),
+            'regions' => $this->regionRepository->all(),
+            'states'  => $this->provinciaRepository->all()
+        ];
+
+        return $this->setStatusCode(Response::HTTP_OK)->respond(['data' => $data]);
+    }
 
     private function check_tags($tags)
     {

@@ -29,7 +29,7 @@ class Photo extends Model
     public static function rules(){
 
         return [
-            'content'         => 'required|imageable',     
+            'content' => 'required|imageable',     
         ];
     }
 

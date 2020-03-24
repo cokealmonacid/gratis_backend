@@ -293,17 +293,17 @@ class PostsController  extends ApiController
 
     private function check_photos($photos)
     { 
-        foreach($photos as $photo) {
-            if (!is_array($photo)) {
-                return false;
-            }
-
-            $validator = Validator::make($photo, Photo::rules());
+        $response = [];
+        foreach($photos as $key => $photo) {
+            $result = ["content" => $photo];
+            $validator = Validator::make($result, Photo::rules());
             if ($validator->fails()){
                 return false;
             }
+
+            $response[] = $result;
         }
 
-        return $photos;
+        return $response;
     }
 }

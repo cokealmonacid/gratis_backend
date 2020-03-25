@@ -169,10 +169,7 @@ class PostUpdateApiTest extends TestCase
 
         $image = \Image::make($path)->encode('data-url');
 
-        return [
-            'content'   => (string)$image,
-            'principal' => false
-        ];
+        return (string)$image;
     }
 }
 

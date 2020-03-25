@@ -98,23 +98,20 @@ class PostCreateApiTest extends TestCase
 
     private function user_login()
     {
-        $user = factory(User::class)->create();
+      $user = factory(User::class)->create();
 
-        Passport::actingAs($user,['api']); 
+      Passport::actingAs($user,['api']); 
     }
 
     private function create_image()
     {
-        $path = base_path() . '/tests/data/images.jpeg';
- 
-        TestCase::assertFileExists($path);
+      $path = base_path() . '/tests/data/images.jpeg';
 
-        $image = \Image::make($path)->encode('data-url');
+      TestCase::assertFileExists($path);
 
-        return [
-            'content'   => (string)$image,
-            'principal' => false
-        ];
+      $image = \Image::make($path)->encode('data-url');
+
+      return (string)$image;
     }
 
 }
